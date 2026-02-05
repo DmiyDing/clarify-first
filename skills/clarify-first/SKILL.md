@@ -5,12 +5,11 @@ description: Use this skill when a request is ambiguous/underspecified, contains
 
 # Clarify First (Agent Skill)
 
-中文名：先澄清再执行
-
 This skill prevents “guess-and-run”. It is a *meta* workflow skill: when requirements are unclear or conflicting, the agent must align with the user before acting.
 
 Language rule:
-- Match the user’s language. If the user writes Chinese, ask questions and present options in Chinese.
+- Match the user’s language. If the user writes Chinese, you may ask questions in Chinese.
+- For Chinese phrasing templates, see `references/zh-CN.md`.
 
 ## When to Activate
 

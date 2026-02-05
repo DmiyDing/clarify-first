@@ -1,134 +1,91 @@
-# Clarify First Skills (Agent Skill) / 先澄清再执行（技能）
+# Clarify First Skills (Agent Skill)
 
-**EN:** A risk-based clarification gate for AI agents and AI coding tools. When a request is ambiguous, underspecified, or conflicting, the agent must *pause*, summarize context, ask targeted clarification questions, and obtain confirmation before taking medium/high-risk actions.  
-**中文：** 面向 AI / AI 编程工具的“风险分级澄清闸门”。当需求模糊、不完整或存在冲突时，AI 必须先暂停执行，梳理上下文、列出不确定点并提问澄清，在进行中/高风险操作前获得用户确认。
+[中文 README](./README.zh-CN.md)
+
+A risk-based clarification gate for AI agents and AI coding tools. When a request is ambiguous, underspecified, or conflicting, the agent must **pause**, summarize context, ask targeted clarification questions, and obtain confirmation before taking medium/high-risk actions.
 
 - Skill: `skills/clarify-first/SKILL.md`
 - Skill name: `clarify-first`
+- License: Apache-2.0
 
----
+## Why
 
-## Why / 为什么要做这个
+AI assistants fail in a predictable way: **they guess** and proceed. That creates wrong work, rework, and trust loss.
 
-- Avoid “guess-and-run” (wrong work, rework, trust loss) / 避免“猜着做”，减少返工与误解
-- Make assumptions explicit (fast alignment) / 把隐含假设显式化，快速对齐
-- Add a safety layer for irreversible actions / 对不可逆操作加一道安全阀
-- Improve throughput in real-world engineering / 提升真实工程场景的交付效率
+This skill enforces:
+- Clear alignment when uncertainty is high
+- Explicit assumptions when uncertainty is low
+- A safety valve before irreversible actions
 
----
+## What it does (Mode B: risk-based)
 
-## What it does / 它做什么
+- **Low risk**: proceed with explicit assumptions + minimal, reversible steps; stop if new ambiguity appears
+- **Medium risk**: inspect first, propose 2–3 options, ask only the blocking questions, then wait for confirmation before larger edits
+- **High risk**: require explicit confirmation before any irreversible action (running side-effect commands, deletion/overwrite, migrations, deploy/publish, secrets/config changes, spending money, contacting people)
 
-**Risk-based (Mode B) / 风险分级（B 模式）**
+## What are “Agent Skills” (practical)
 
-- **Low risk / 低风险**：允许继续，但必须声明假设、保持可逆、最小改动；遇到新歧义立即停下追问
-- **Medium risk / 中风险**：先做只读检查 + 给 2–3 个方案 + 问关键问题；确认后再进行较大改动
-- **High risk / 高风险**：必须先确认（尤其是运行有副作用命令、删除/覆盖、迁移、发布/部署、改配置/密钥、花钱、联系他人等）
-
-**Output discipline / 输出纪律**
-
-- 先“对齐快照” → 再“阻塞问题” → 再“可选问题” → 再“选项与权衡” → 再“下一步需要你确认什么”
-- 尽量只问 1–5 个问题，每个问题给 2–3 个选项（含推荐项）
-- 用户中文就中文问；用户英文就英文问
-
----
-
-## What are “Agent Skills”? / Agent Skills 是什么（实用定义）
-
-This repo follows the “Agent Skills” convention used by Anthropic examples:
-
-- A skill is a folder that contains a required `SKILL.md`
+This repo follows the Agent Skills convention (as used in Anthropic examples):
+- A skill is a folder containing a required `SKILL.md`
 - `SKILL.md` starts with YAML frontmatter (at minimum `name` + `description`)
 - The agent uses `description` to decide when to activate the skill; the body is the workflow once activated
 
----
+## Install
 
-## Installation / 安装
+### 1) Tools that support Agent Skills / skills CLI
 
-### Option A — Skills CLI ecosystem (recommended) / 推荐：Skills CLI 生态
-
-Many agentic coding tools support installing Agent Skills via a `skills` CLI and an agent selector. The exact `--agent` name varies by tool.
+If your agent/client supports installing skills via a CLI, install from GitHub:
 
 ```bash
-# Install from a GitHub repo URL (recommended for open-source distribution)
-npx skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent <agent-name>
+npx -y skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent <agent-name>
 ```
 
-Examples (adjust `--agent` to your tool):
+Notes:
+- You may need to restart your client after installation.
+- If auto-trigger is flaky, explicitly say: “Use the `clarify-first` skill.”
 
-```bash
-npx skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent claude-code
-npx skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent cursor
-npx skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent codex
-npx skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent windsurf
-npx skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent github-copilot
-npx skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent gemini-cli
-```
+### 2) OpenAI Codex CLI (recommended integration)
 
-Notes / 注意：
-- Some tools require restart after installing skills / 有些工具安装后需要重启
-- If auto-trigger is flaky, explicitly say: “Use the `clarify-first` skill.” / 若自动触发不稳定，建议显式点名
+OpenAI Codex CLI does not natively consume Anthropic-style “Agent Skills folders”. The most reliable way is to **copy the policy into your project’s `AGENTS.md`** so Codex auto-loads it.
 
-### Option B — Manual copy / 手动复制
+Minimal pattern:
+- Copy the “Core Workflow” rules from `skills/clarify-first/SKILL.md` into `AGENTS.md`
+- Keep it short; link back to this repo for full details
 
-If your agent/tool has a “skills directory”, copy the folder:
+If you want, tell me where you want it applied (global vs per-repo) and I’ll generate a clean `AGENTS.md` snippet optimized for Codex CLI.
 
-- Copy `skills/clarify-first/` into your agent’s skills directory
-- Ensure `SKILL.md` remains at the root of the skill folder
+## Use
 
----
+Most reliable:
+- “Use the `clarify-first` skill. If anything is ambiguous or high-impact, ask me the blocking questions first.”
 
-## Usage / 使用方式
+## Design principles
 
-### 1) Explicit invocation / 显式调用（最可靠）
+- Alignment before action when uncertainty is high
+- Ask fewer, better questions (prefer choices; 1–5 questions)
+- Provide options with tradeoffs (don’t silently override user intent)
+- Progressive disclosure: keep the core workflow compact; move long examples into references
+- Reversible by default: small steps → confirm → expand
 
-- EN: “Use the `clarify-first` skill and ask me any blocking questions before making changes.”
-- 中文：“使用 `clarify-first` 技能。对中/高风险操作先问我确认，不要猜。”
-
-### 2) Natural trigger / 自然触发（取决于工具的技能发现能力）
-
-The skill should activate when the user request is ambiguous, underspecified, or conflicting.
-
----
-
-## Design principles / 设计理念（追求卓越）
-
-- **Alignment > action** when uncertainty is high / 不确定性高时，对齐优先于行动
-- **Ask fewer, better questions** / 少问但问到点子上
-- **Provide options with tradeoffs** / 给方案与权衡，而不是替用户“擅自决定”
-- **Progressive disclosure** / 必要时才展开细节，避免提示词臃肿
-- **Reversible by default** / 默认可逆：先小步、再确认、再扩展
-
----
-
-## Repository layout / 仓库结构
+## Repo layout
 
 ```
 skills/
   clarify-first/
     SKILL.md
+    references/
+      zh-CN.md
 ```
 
----
+## Publishing to Smithery (later)
 
-## License / 许可证
+Once you’ve validated the repo in real usage:
+- Create a release/tag (e.g. `v0.1.0`)
+- Publish the GitHub URL on Smithery as a Skill listing (so users can install via a `smithery.ai/skills/<namespace>/<slug>` URL)
+- Add a short “Install” section in the Smithery listing that mirrors the CLI command above
+- Ask early users to submit reviews (Smithery supports reviews on skill pages)
 
-Apache-2.0. See `LICENSE`.
+## GitHub Description (copy/paste)
 
----
+`Risk-based clarification gate for AI agents — ask before acting on ambiguous or high-impact requests. 需求不清先澄清再执行。`
 
-## Suggested GitHub description / GitHub 项目描述（中英文）
-
-Use one of these as your repo “Description”:
-
-- EN: `Risk-based clarification gate for AI agents: ask before acting on ambiguous or high-impact requests.`
-- 中文：`面向 AI 编程工具的风险分级澄清闸门：需求不清先澄清再执行，避免误解与返工。`
-- EN + 中文（合并版）：`Risk-based clarification gate for AI agents — 需求不清先澄清再执行。`
-
----
-
-## Roadmap / 路线图（可选）
-
-- Add a compact “compatibility matrix” once you confirm exact clients and install paths
-- Add “conflict resolution” mini-framework (priority rules + examples)
-- Add canned question sets per domain (backend, frontend, data, devops) as small reference files
