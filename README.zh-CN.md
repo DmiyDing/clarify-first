@@ -25,27 +25,52 @@
 
 ## 安装
 
-### 1）支持 Agent Skills / skills CLI 的工具
+### 1）推荐：`add-skill`（多客户端安装器）
 
-如果你的工具支持通过 CLI 安装 skills：
+如果你的工具支持 skills 目录，这通常是最省心的方式。
 
 ```bash
-npx -y skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent <agent-name>
+npx -y add-skill DmiyDing/clarify-first-skills --skill clarify-first
 ```
 
 提示：
 - 安装后可能需要重启客户端。
 - 自动触发不稳定时，建议在对话里显式说“使用 `clarify-first` skill”。
 
-### 2）OpenAI Codex CLI
+### 2）如果你的工具使用 `skills` CLI
 
-OpenAI Codex CLI 不会直接加载 Anthropic 风格的“skills 文件夹”。最可靠的做法是把核心规则复制进你的项目 `AGENTS.md`，让 Codex 自动加载。
+有些工具使用 `skills` CLI 风格的安装方式：
 
-你告诉我你希望全局生效还是某个仓库生效，我可以给你生成一段专门为 Codex CLI 优化的 `AGENTS.md` 片段。
+```bash
+npx -y skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent <agent-name>
+```
+
+### 3）OpenAI Codex CLI
+
+OpenAI Codex CLI 会可靠加载 `AGENTS.md / AGENTS.override.md`（仓库内或 `~/.codex/` 下的全局默认）。想“默认生效”，建议把规则放在：
+
+- 仓库级：`<repo>/AGENTS.override.md`（优先）或 `<repo>/AGENTS.md`
+- 全局级：`~/.codex/AGENTS.override.md`（优先）或 `~/.codex/AGENTS.md`
+
+可直接粘贴的最小片段（英文优先，便于模型稳定执行）：
+
+```markdown
+# Clarify First (risk-based)
+
+When a request is ambiguous, underspecified, conflicting, or high-impact, do not guess.
+
+Risk triage:
+- Low: proceed with explicit assumptions and minimal reversible steps; stop if new ambiguity appears.
+- Medium: inspect read-only first; propose 2–3 options; ask only blocking questions; wait for confirmation before larger edits or running commands.
+- High: require explicit confirmation ("Yes, proceed") before any irreversible action (side-effect commands, deletion/overwrite, migrations, deploy/publish, secrets/config changes, spending money, contacting people).
+
+If you see a better approach than requested, present it as an option and ask the user to choose.
+```
+
+你告诉我你想全局生效还是某个仓库生效，我也可以帮你把措辞压到更短、更适合你日常工作流的版本。
 
 ## 使用方式
 
 最可靠（显式调用）：
 - “Use the `clarify-first` skill. If anything is ambiguous or high-impact, ask me the blocking questions first.”
 - “使用 `clarify-first` 技能。中/高风险操作先问我确认，不要猜。”
-

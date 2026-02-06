@@ -32,27 +32,51 @@ This repo follows the Agent Skills convention (as used in Anthropic examples):
 
 ## Install
 
-### 1) Tools that support Agent Skills / skills CLI
+### 1) Recommended: `add-skill` (multi-client installer)
 
-If your agent/client supports installing skills via a CLI, install from GitHub:
+If your agent/client supports skills directories, this is the most convenient way to install from GitHub.
+
+Install into the current project:
 
 ```bash
-npx -y skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent <agent-name>
+npx -y add-skill DmiyDing/clarify-first-skills --skill clarify-first
 ```
 
 Notes:
 - You may need to restart your client after installation.
 - If auto-trigger is flaky, explicitly say: “Use the `clarify-first` skill.”
 
-### 2) OpenAI Codex CLI (recommended integration)
+### 2) If your tool uses the `skills` CLI
 
-OpenAI Codex CLI does not natively consume Anthropic-style “Agent Skills folders”. The most reliable way is to **copy the policy into your project’s `AGENTS.md`** so Codex auto-loads it.
+Some tools use a `skills` CLI style installer:
 
-Minimal pattern:
-- Copy the “Core Workflow” rules from `skills/clarify-first/SKILL.md` into `AGENTS.md`
-- Keep it short; link back to this repo for full details
+```bash
+npx -y skills add https://github.com/DmiyDing/clarify-first-skills@clarify-first --agent <agent-name>
+```
 
-If you want, tell me where you want it applied (global vs per-repo) and I’ll generate a clean `AGENTS.md` snippet optimized for Codex CLI.
+### 3) OpenAI Codex CLI (recommended integration)
+
+OpenAI Codex CLI reliably loads instruction files named `AGENTS.md` / `AGENTS.override.md` (and the same under `~/.codex/` for global defaults). To make this behavior “always on”, add it to either:
+
+- Repo scope: `<your-repo>/AGENTS.override.md` (preferred), or `<your-repo>/AGENTS.md`
+- Global scope: `~/.codex/AGENTS.override.md` (preferred), or `~/.codex/AGENTS.md`
+
+Suggested snippet (paste as-is, keep it short):
+
+```markdown
+# Clarify First (risk-based)
+
+When a request is ambiguous, underspecified, conflicting, or high-impact, do not guess.
+
+Risk triage:
+- Low: proceed with explicit assumptions and minimal reversible steps; stop if new ambiguity appears.
+- Medium: inspect read-only first; propose 2–3 options; ask only blocking questions; wait for confirmation before larger edits or running commands.
+- High: require explicit confirmation ("Yes, proceed") before any irreversible action (side-effect commands, deletion/overwrite, migrations, deploy/publish, secrets/config changes, spending money, contacting people).
+
+If you see a better approach than requested, present it as an option and ask the user to choose.
+```
+
+If you tell me whether you prefer repo-scope or global-scope, I can tailor the snippet to your workflow and risk tolerance.
 
 ## Use
 
@@ -82,10 +106,10 @@ skills/
 Once you’ve validated the repo in real usage:
 - Create a release/tag (e.g. `v0.1.0`)
 - Publish the GitHub URL on Smithery as a Skill listing (so users can install via a `smithery.ai/skills/<namespace>/<slug>` URL)
-- Add a short “Install” section in the Smithery listing that mirrors the CLI command above
+- Add a short “Install” section in the Smithery listing that mirrors the install command above
 - Ask early users to submit reviews (Smithery supports reviews on skill pages)
+ - Add one “before/after” usage example (a short chat transcript) to make the value obvious in 10 seconds
 
 ## GitHub Description (copy/paste)
 
 `Risk-based clarification gate for AI agents — ask before acting on ambiguous or high-impact requests. 需求不清先澄清再执行。`
-
