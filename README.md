@@ -75,12 +75,16 @@ If you see a better approach than requested, present it as an option and ask the
 
 ```
 skills/clarify-first/
-├── SKILL.md           # Skill definition and workflow
+├── SKILL.md           # Skill definition, workflow, anti-patterns
 └── references/
     ├── zh-CN.md       # Chinese phrasing templates
     ├── EXAMPLES.md    # Example inputs and expected behavior
-    └── QUESTION_BANK.md
+    ├── QUESTION_BANK.md
+    ├── SCENARIOS.md   # Bug report, design/RFC, feature-scope scenarios
+    └── NFR.md         # Non-functional requirements clarification checklist
 ```
+
+The skill uses progressive disclosure: the agent loads `SKILL.md` when the skill triggers, and only opens `references/*` when needed (e.g. NFR for performance/scale, SCENARIOS for bugs or design).
 
 ## Contributing and license
 

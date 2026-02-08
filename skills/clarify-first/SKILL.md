@@ -12,6 +12,7 @@ This skill is a *meta* workflow: when requirements are unclear or conflicting, t
 Language rule:
 - Match the user’s language. If the user writes Chinese, you may ask questions in Chinese.
 - For Chinese phrasing templates, see `references/zh-CN.md`.
+- When replying in Chinese, prefer the structure and phrasing in `references/zh-CN.md` for the alignment snapshot and blocking questions.
 
 ## When to Activate
 
@@ -54,6 +55,8 @@ Provide a short recap (2–6 bullets) of:
 - Relevant constraints already known (repo, language, target environment, timeline)
 - What you are *not* assuming yet
 
+**Always** include at least one bullet for “What I am not assuming yet” so the user sees what is still open.
+
 ### Step 2 — Uncertainties & conflicts
 
 List uncertainties as **action-blocking** vs **nice-to-have**:
@@ -69,6 +72,8 @@ For each option, include:
 - Tradeoffs (time/risk/quality)
 - What you need from the user
 
+If one option is clearly safer or more common, mark it “(Recommended)” so the user can choose quickly.
+
 ### Step 4 — Ask targeted clarification questions
 
 Ask the **minimum** number of questions needed (prefer **1–5** total).
@@ -77,6 +82,8 @@ Rules:
 - Questions must be specific, answerable, and ordered by impact.
 - Whenever possible, provide **2–3 choices** and mark a default as “(Recommended)”.
 - Avoid open-ended “tell me more” unless unavoidable.
+- **Optional**: use 5W1H (Who/What/Where/When/Why/How) to structure blocking questions so coverage is clear.
+- If the user stays vague, **paraphrase** (“So what I hear is…”) then ask the missing piece; if the request is unreasonable, offer **alternatives** instead of a flat no (see “Better solution” guardrail).
 
 ### Step 5 — Confirm and restate before acting
 
@@ -84,7 +91,7 @@ After the user answers, restate the finalized requirements in a short “Working
 - Scope (in/out)
 - Deliverables
 - Constraints
-- Acceptance criteria
+- Acceptance criteria (prefer **Definition of Done** or **Given-When-Then** so “done” is testable)
 - What you will do next
 
 Then ask for a clear go-ahead: “Confirm / OK to proceed?”
@@ -100,7 +107,10 @@ If you see a clearly better approach than what the user requested:
 
 ## Output Template
 
-Use this structure when clarification is needed:
+Use this structure when clarification is needed. When replying, **use the five parts explicitly** (or at least label alignment, blocking questions, options, and next step) so the user sees the structure; avoid merging everything into one paragraph.
+
+- **Short clarification** (only one dimension missing): 1–2 alignment bullets plus one blocking question with choices may suffice.
+- **Multiple uncertainties or high impact**: use the full template below.
 
 1) **Alignment snapshot**
 - …
@@ -120,13 +130,21 @@ Use this structure when clarification is needed:
 5) **Proposed next step**
 - “If you confirm Option A + answers to Q1–Q2, I will …”
 
+## Avoid these (anti-patterns)
+
+- **Assumption bias**: Acting as if you understood when you didn’t—always make “what I am not assuming” explicit.
+- **Yes man**: Agreeing without clarifying—pause and ask blocking questions instead of nodding.
+- **Solutioning too early**: Discussing implementation (e.g. DB schema, APIs) before the problem and acceptance criteria are clear—clarify scope and “done” first.
+
 ## Quick Question Bank
 
 Use only what's relevant; prefer choices. **Full list**: See [references/QUESTION_BANK.md](references/QUESTION_BANK.md).
 
 - **Scope**: what is in/out? single file vs whole repo?
-- **Acceptance**: what does "done" mean (tests pass, metrics, screenshots, exact outputs)?
+- **Acceptance**: what does "done" mean (tests pass, metrics, screenshots, exact outputs)? Prefer DoD or Given-When-Then.
 - **Risk**: is it OK to change APIs, run commands, delete/overwrite, deploy/publish?
+
+**Scenario-based and NFR**: For bug reports, design/RFC, or when the request touches performance/scale/deployment, see [references/SCENARIOS.md](references/SCENARIOS.md) and [references/NFR.md](references/NFR.md).
 
 ## Examples
 

@@ -75,12 +75,16 @@ If you see a better approach than requested, present it as an option and ask the
 
 ```
 skills/clarify-first/
-├── SKILL.md           # 技能定义与工作流
+├── SKILL.md           # 技能定义、工作流、反模式
 └── references/
     ├── zh-CN.md       # 中文措辞参考
     ├── EXAMPLES.md    # 示例输入与预期行为
-    └── QUESTION_BANK.md
+    ├── QUESTION_BANK.md
+    ├── SCENARIOS.md   # Bug 报告、设计/RFC、需求范围等场景
+    └── NFR.md         # 非功能性需求澄清清单
 ```
+
+技能采用渐进式披露：agent 在触发时加载 `SKILL.md`，仅在需要时打开 `references/*`（如涉及性能/规模时用 NFR，Bug 或设计时用 SCENARIOS）。
 
 ## 参与与协议
 
