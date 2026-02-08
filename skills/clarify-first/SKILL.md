@@ -1,11 +1,13 @@
 ---
 name: clarify-first
-description: Use this skill when a request is ambiguous/underspecified, contains conflicts, or has high-impact consequences. The agent must do a quick risk triage (low/medium/high). For low-risk work, proceed with explicit assumptions and reversible steps. For medium/high-risk or conflicting requirements, pause execution, summarize context, list uncertainties, ask targeted clarification questions (with choices), and get confirmation before irreversible actions (writing files, running commands, deleting data, deploying, messaging, spending money). If a better solution exists, propose it and ask the user to choose.
+description: Risk-based clarification gate for agents. Use when a request is ambiguous, underspecified, contains conflicts, or has high-impact consequences (writing files, running commands, deleting data, deploying, spending money). The agent must do risk triage (low/medium/high); for medium/high risk or conflicts, pause and get confirmation before acting. Do not use when the request is already precise, low-risk, and has clear acceptance criteria.
 ---
 
 # Clarify First (Agent Skill)
 
-This skill prevents “guess-and-run”. It is a *meta* workflow skill: when requirements are unclear or conflicting, the agent must align with the user before acting.
+**One-line**: Prevents “guess-and-run”; when requirements are unclear or high-impact, align with the user (risk triage → recap → options → confirm) before acting.
+
+This skill is a *meta* workflow: when requirements are unclear or conflicting, the agent must align with the user before acting.
 
 Language rule:
 - Match the user’s language. If the user writes Chinese, you may ask questions in Chinese.
@@ -23,7 +25,7 @@ Activate when **any** of these are true:
 
 Do **not** activate (or keep it minimal) when the request is already precise, low-risk, and has clear acceptance criteria.
 
-## Core Workflow (Do this in order)
+## Core Workflow (follow in order)
 
 ### Step 0 — Risk triage (B: risk-based)
 
@@ -118,33 +120,14 @@ Use this structure when clarification is needed:
 5) **Proposed next step**
 - “If you confirm Option A + answers to Q1–Q2, I will …”
 
-## Quick Question Bank (keep it short)
+## Quick Question Bank
 
-Use only what’s relevant; prefer choices.
+Use only what's relevant; prefer choices. **Full list**: See [references/QUESTION_BANK.md](references/QUESTION_BANK.md).
 
 - **Scope**: what is in/out? single file vs whole repo?
-- **Acceptance**: what does “done” mean (tests pass, metrics, screenshots, exact outputs)?
-- **Constraints**: framework/runtime versions, target OS, backwards compatibility, performance/security/UX requirements.
-- **Risk**: is it OK to change APIs, upgrade deps, run commands, delete/overwrite, deploy/publish?
-- **Context**: expected current behavior vs desired behavior; minimal repro; logs/errors; sample inputs/outputs.
+- **Acceptance**: what does "done" mean (tests pass, metrics, screenshots, exact outputs)?
+- **Risk**: is it OK to change APIs, run commands, delete/overwrite, deploy/publish?
 
 ## Examples
 
-### Example 1 — Vague coding request
-
-Input: “帮我把这个项目优化一下，尽快上线。”
-
-Expected behavior:
-- Snapshot: what “optimize” might mean (performance/UX/bundle size/test flakiness)
-- Blocking questions: target “上线” environment, definition of “done”, constraints (no breaking changes?)
-- Options: “quick wins only” vs “full refactor” vs “perf profiling first”
-- Wait for confirmation before changes
-
-### Example 2 — Conflicting constraints
-
-Input: “不要改接口，但把后端彻底重构成微服务。”
-
-Expected behavior:
-- Call out conflict: “彻底重构” implies interface changes risk
-- Ask which is higher priority + acceptable migration plan
-- Propose phased approach options
+**Concrete examples (vague requests, conflicting constraints)**: See [references/EXAMPLES.md](references/EXAMPLES.md).

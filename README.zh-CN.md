@@ -1,54 +1,62 @@
-# Clarify First Skills（先澄清再执行）
+# Clarify First
 
-[English README](./README.md)
+**先澄清，再执行。** 一个 [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)，让 Claude、Cursor 等在遇到模糊或高风险请求时先暂停，问清关键问题并在你确认后再改代码或执行命令。
 
-这是一个面向 AI / AI 编程工具的“风险分级澄清闸门”：当需求模糊、不完整或存在冲突时，AI 必须先**暂停执行**，梳理上下文、提出最少但关键的澄清问题，并在进行中/高风险操作前获得用户确认。
+[English](./README.md) · **协议：** [Apache-2.0](./LICENSE)
 
-- Skill：`skills/clarify-first/SKILL.md`
-- Skill 名称：`clarify-first`
-- 协议：Apache-2.0
+---
 
-## 为什么需要它
+## 为什么需要
 
-很多 AI 助手会在信息不足时“猜着做”，带来返工、误解和信任成本。
+AI 编程助手在需求不清时常常**猜着做**，结果就是改错、返工和信任损耗。Clarify First 加了一道「风险分级」的闸门：当请求模糊或风险较高时，agent 会先暂停、梳理理解、给出选项，并在你明确同意后再动手。
 
-这个技能的目标：
-- 不确定性高：先对齐再行动
-- 不确定性低：在明确假设下小步快跑
-- 不可逆动作：必须先确认
+## 效果对比
 
-## 它做什么（B：风险分级）
-
-- **低风险**：允许继续，但必须声明假设、保持最小改动与可逆；出现新歧义立刻停下追问
-- **中风险**：先只读检查，再给 2–3 个选项与权衡，问阻塞问题，确认后再做较大改动
-- **高风险**：必须显式确认后才执行（跑有副作用命令、删除/覆盖、迁移、部署/发布、改配置/密钥、花钱、联系他人等）
+| 未使用 Clarify First | 使用 Clarify First |
+|----------------------|--------------------|
+| 你：「把应用优化一下然后上线。」 | 你：「把应用优化一下然后上线。」 |
+| Agent 直接开始改代码、重构。 | Agent 先暂停，问：范围（小优化还是大重构？）、「上线」的定义、你倾向的选项。 |
+| 你：「其实我只想修一个慢查询……」 | 你：「小优化；上线=部署到 staging 且检查单全绿。」 |
+| 返工、心累。 | Agent 在明确范围内执行，无返工。 |
 
 ## 安装
 
-### 1）推荐：`skills` CLI（多客户端安装器）
-
-如果你的工具支持 Agent Skills，这是最省心的方式：
+**支持 Agent Skills 的 Cursor、Claude Code 等：**
 
 ```bash
 npx -y skills add DmiyDing/clarify-first-skills --skill clarify-first
 ```
 
-提示：
-- `add-skill` 已更名为 `skills`（旧命令可能会提示 deprecated 并自动转发）。
-- 安装后可能需要重启客户端。
-- 自动触发不稳定时，建议在对话里显式说“使用 `clarify-first` skill”。
+安装后重启客户端。若未自动触发，可在对话中说：「使用 clarify-first skill」。
 
-排查：
-- **Cursor 看不到 skill**：确认 `~/.cursor/skills/clarify-first/` 是“真实目录”且包含 `SKILL.md`。部分 Cursor 版本可能不会发现“软链接”的 skill 目录；请在安装时选择 Copy 而不是 Symlink，或手动把软链接替换为真实目录。
+**排查（Cursor）：** 若看不到该 skill，请确认 `~/.cursor/skills/clarify-first/` 是真实目录（非软链接）且内含 `SKILL.md`；必要时用「复制」而非「软链接」重新安装。
 
-### 2）OpenAI Codex CLI
+**Codex（AGENTS.md）：** 若希望在某仓库或全局固定该行为，可将 [下方片段](#codex-agentsmd-片段) 写入 `AGENTS.override.md` 或 `AGENTS.md`。
 
-OpenAI Codex CLI 会可靠加载 `AGENTS.md / AGENTS.override.md`（仓库内或 `~/.codex/` 下的全局默认）。想“默认生效”，建议把规则放在：
+## 使用方式
 
-- 仓库级：`<repo>/AGENTS.override.md`（优先）或 `<repo>/AGENTS.md`
-- 全局级：`~/.codex/AGENTS.override.md`（优先）或 `~/.codex/AGENTS.md`
+安装后，当 agent 识别到模糊或高风险请求时会自动启用。也可显式调用：
 
-可直接粘贴的最小片段（英文优先，便于模型稳定执行）：
+- 「使用 clarify-first 技能。有模糊或高风险的地方先问我确认，不要猜。」
+
+Agent 会先对齐范围、提出 1–5 个关键问题（尽量给选项），并在你确认后再改代码或执行命令。
+
+## 工作原理
+
+- **低风险**（只读、小范围可逆改动）：agent 可在声明假设后继续，一旦出现新歧义会停下追问。
+- **中风险**（重构、改接口等）：agent 先只读检查，给出 2–3 个选项、问清阻塞问题，确认后再做较大改动。
+- **高风险**（删除、部署、改密钥等）：agent 会要求你显式确认（如「可以，执行」）后再执行。
+
+详细流程见技能本体：`skills/clarify-first/SKILL.md`。
+
+## 兼容性
+
+- **Agent Skills**：本仓库遵循 [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) 约定（Anthropic）。技能即包含 `SKILL.md`（YAML frontmatter + 正文）的目录，agent 根据 `description` 决定何时加载。
+- **客户端**：Cursor、Claude Code、Codex 以及任何支持从 GitHub 或本地路径加载 Agent Skills 的客户端。
+
+### Codex AGENTS.md 片段
+
+在 Codex 中，将以下内容写入 `AGENTS.override.md` 或 `AGENTS.md`（仓库内或 `~/.codex/`）：
 
 ```markdown
 # Clarify First (risk-based)
@@ -63,10 +71,17 @@ Risk triage:
 If you see a better approach than requested, present it as an option and ask the user to choose.
 ```
 
-你告诉我你想全局生效还是某个仓库生效，我也可以帮你把措辞压到更短、更适合你日常工作流的版本。
+## 仓库结构
 
-## 使用方式
+```
+skills/clarify-first/
+├── SKILL.md           # 技能定义与工作流
+└── references/
+    ├── zh-CN.md       # 中文措辞参考
+    ├── EXAMPLES.md    # 示例输入与预期行为
+    └── QUESTION_BANK.md
+```
 
-最可靠（显式调用）：
-- “Use the `clarify-first` skill. If anything is ambiguous or high-impact, ask me the blocking questions first.”
-- “使用 `clarify-first` 技能。中/高风险操作先问我确认，不要猜。”
+## 参与与协议
+
+欢迎贡献。本项目采用 [Apache-2.0](./LICENSE) 许可。

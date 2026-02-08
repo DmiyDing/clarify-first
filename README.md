@@ -1,61 +1,62 @@
-# Clarify First Skills (Agent Skill)
+# Clarify First
 
-[Chinese README](./README.zh-CN.md)
+**Stop AI from guessing.** An [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) that makes Claude and Cursor pause on vague or high-impact requests, ask a few targeted questions, and get your confirmation before changing files or running commands.
 
-A risk-based clarification gate for AI agents and AI coding tools. When a request is ambiguous, underspecified, or conflicting, the agent must **pause**, summarize context, ask targeted clarification questions, and obtain confirmation before taking medium/high-risk actions.
+[中文](./README.zh-CN.md) · **License:** [Apache-2.0](./LICENSE)
 
-- Skill: `skills/clarify-first/SKILL.md`
-- Skill name: `clarify-first`
-- License: Apache-2.0
+---
 
 ## Why
 
-AI assistants fail in a predictable way: **they guess** and proceed. That creates wrong work, rework, and trust loss.
+AI coding assistants often **guess and proceed** when your request is ambiguous. The result: wrong edits, rework, and lost trust. Clarify First adds a risk-based gate: when the request is unclear or risky, the agent pauses, summarizes what it understands, proposes options, and waits for your go-ahead before acting.
 
-This skill enforces:
-- Clear alignment when uncertainty is high
-- Explicit assumptions when uncertainty is low
-- A safety valve before irreversible actions
+## Example
 
-## What it does (Mode B: risk-based)
-
-- **Low risk**: proceed with explicit assumptions + minimal, reversible steps; stop if new ambiguity appears
-- **Medium risk**: inspect first, propose 2–3 options, ask only the blocking questions, then wait for confirmation before larger edits
-- **High risk**: require explicit confirmation before any irreversible action (running side-effect commands, deletion/overwrite, migrations, deploy/publish, secrets/config changes, spending money, contacting people)
-
-## What are “Agent Skills” (practical)
-
-This repo follows the Agent Skills convention (as used in Anthropic examples):
-- A skill is a folder containing a required `SKILL.md`
-- `SKILL.md` starts with YAML frontmatter (at minimum `name` + `description`)
-- The agent uses `description` to decide when to activate the skill; the body is the workflow once activated
+| Without Clarify First | With Clarify First |
+|-----------------------|--------------------|
+| You: *"Optimize the app and ship it."* | You: *"Optimize the app and ship it."* |
+| Agent starts refactoring and changing files. | Agent pauses and asks: scope (quick wins vs full refactor?), definition of "shipped", and your preferred option. |
+| You: *"I only wanted to fix one slow query…"* | You: *"Quick wins; shipped = deploy to staging with green checklist."* |
+| Rework and frustration. | Agent proceeds with clear scope; no rework. |
 
 ## Install
 
-### 1) Recommended: `skills` CLI (multi-client installer)
-
-If your agent/client supports Agent Skills, install from GitHub:
+**Cursor, Claude Code, and other clients that support Agent Skills:**
 
 ```bash
 npx -y skills add DmiyDing/clarify-first-skills --skill clarify-first
 ```
 
-Notes:
-- `add-skill` was renamed to `skills` (the old name may print a deprecation warning and forward automatically).
-- You may need to restart your client after installation.
-- If auto-trigger is flaky, explicitly say: “Use the `clarify-first` skill.”
+Restart your client after installation. If the skill doesn’t auto-trigger, say: *"Use the clarify-first skill."*
 
-Troubleshooting:
-- **Cursor doesn’t show the skill**: verify a real folder exists at `~/.cursor/skills/clarify-first/` with `SKILL.md`. Some Cursor builds may not discover **symlinked** skill folders; reinstall choosing “Copy” instead of “Symlink”, or manually replace the symlink with a real directory.
+**Troubleshooting (Cursor):** If the skill doesn’t appear, ensure `~/.cursor/skills/clarify-first/` is a real directory (not a symlink) and contains `SKILL.md`. Reinstall with "Copy" instead of "Symlink" if needed.
 
-### 2) OpenAI Codex CLI (recommended integration)
+**Codex (AGENTS.md):** To bake the behavior into a repo or global config, add the [snippet below](#codex-agentsmd-snippet) to `AGENTS.override.md` or `AGENTS.md`.
 
-OpenAI Codex CLI reliably loads instruction files named `AGENTS.md` / `AGENTS.override.md` (and the same under `~/.codex/` for global defaults). To make this behavior “always on”, add it to either:
+## Usage
 
-- Repo scope: `<your-repo>/AGENTS.override.md` (preferred), or `<your-repo>/AGENTS.md`
-- Global scope: `~/.codex/AGENTS.override.md` (preferred), or `~/.codex/AGENTS.md`
+After install, the skill activates when the agent detects ambiguous or high-impact requests. You can also invoke it explicitly:
 
-Suggested snippet (paste as-is, keep it short):
+- *"Use the clarify-first skill. If anything is ambiguous or high-impact, ask me the blocking questions first."*
+
+The agent will then align on scope, ask 1–5 targeted questions (with choices when possible), and wait for your confirmation before making changes or running commands.
+
+## How it works
+
+- **Low risk** (read-only, small reversible edits): the agent may proceed with explicit assumptions and will stop if new ambiguity appears.
+- **Medium risk** (refactors, API changes, etc.): the agent inspects first, proposes 2–3 options, asks blocking questions, and waits for confirmation before larger edits.
+- **High risk** (deletes, deploy, secrets, etc.): the agent requires explicit confirmation (e.g. *"Yes, proceed"*) before taking action.
+
+Details and workflows are in the skill body: `skills/clarify-first/SKILL.md`.
+
+## Compatibility
+
+- **Agent Skills**: This repo follows the [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) convention (Anthropic). The skill is a directory with a `SKILL.md` (YAML frontmatter + markdown). The agent uses the `description` field to decide when to load it.
+- **Clients**: Cursor, Claude Code, Codex, and any client that supports loading Agent Skills from a GitHub repo or local path.
+
+### Codex AGENTS.md snippet
+
+For Codex, paste this into `AGENTS.override.md` or `AGENTS.md` (repo or `~/.codex/`):
 
 ```markdown
 # Clarify First (risk-based)
@@ -70,40 +71,17 @@ Risk triage:
 If you see a better approach than requested, present it as an option and ask the user to choose.
 ```
 
-If you tell me whether you prefer repo-scope or global-scope, I can tailor the snippet to your workflow and risk tolerance.
-
-## Use
-
-Most reliable:
-- “Use the `clarify-first` skill. If anything is ambiguous or high-impact, ask me the blocking questions first.”
-
-## Design principles
-
-- Alignment before action when uncertainty is high
-- Ask fewer, better questions (prefer choices; 1–5 questions)
-- Provide options with tradeoffs (don’t silently override user intent)
-- Progressive disclosure: keep the core workflow compact; move long examples into references
-- Reversible by default: small steps → confirm → expand
-
-## Repo layout
+## Repository structure
 
 ```
-skills/
-  clarify-first/
-    SKILL.md
-    references/
-      zh-CN.md
+skills/clarify-first/
+├── SKILL.md           # Skill definition and workflow
+└── references/
+    ├── zh-CN.md       # Chinese phrasing templates
+    ├── EXAMPLES.md    # Example inputs and expected behavior
+    └── QUESTION_BANK.md
 ```
 
-## Publishing to Smithery (later)
+## Contributing and license
 
-Once you’ve validated the repo in real usage:
-- Create a release/tag (e.g. `v0.1.0`)
-- Publish the GitHub URL on Smithery as a Skill listing (so users can install via a `smithery.ai/skills/<namespace>/<slug>` URL)
-- Add a short “Install” section in the Smithery listing that mirrors the install command above
-- Ask early users to submit reviews (Smithery supports reviews on skill pages)
- - Add one “before/after” usage example (a short chat transcript) to make the value obvious in 10 seconds
-
-## GitHub Description (copy/paste)
-
-`Risk-based clarification gate for AI agents — ask before acting on ambiguous or high-impact requests.`
+Contributions are welcome. This project is licensed under [Apache-2.0](./LICENSE).
