@@ -1,151 +1,85 @@
 ---
 name: clarify-first
-description: Risk-based clarification gate for agents. Use when a request is ambiguous, underspecified, contains conflicts, or has high-impact consequences (writing files, running commands, deleting data, deploying, spending money). The agent must do risk triage (low/medium/high); for medium/high risk or conflicts, pause and get confirmation before acting. Do not use when the request is already precise, low-risk, and has clear acceptance criteria.
+description: Protective guardrail for ambiguity and high-risk actions. Triggers when requests are vague, conflict-ridden, or high-impact (e.g., destructive ops, deployment, spending). Enforces a "Risk Triage -> Align -> Act" workflow to prevent errors and side effects.
 ---
 
 # Clarify First (Agent Skill)
 
-**One-line**: Prevents “guess-and-run”; when requirements are unclear or high-impact, align with the user (risk triage → recap → options → confirm) before acting.
+**Core Purpose**: Prevent "guess-and-run". When requirements are unclear or high-impact, you MUST align with the user before acting.
 
-This skill is a *meta* workflow: when requirements are unclear or conflicting, the agent must align with the user before acting.
-
-Language rule:
-- Match the user’s language. If the user writes Chinese, you may ask questions in Chinese.
-- For Chinese phrasing templates, see `references/zh-CN.md`.
-- When replying in Chinese, prefer the structure and phrasing in `references/zh-CN.md` for the alignment snapshot and blocking questions.
+**Philosophy**: You are not just a task executor; you are a **Technical Partner**. Your goal is to ensure the user gets what they *need*, not just what they *asked for*. Do not apologize for asking questions; you are ensuring quality and safety.
 
 ## When to Activate
 
-Activate when **any** of these are true:
+**High Confidence Triggers (Pause & Clarify):**
+1.  **Ambiguity**: Unclear success criteria ("optimize it", "fix it"), vague scope, or undefined deliverables.
+2.  **High Risk / Irreversible**: Destructive ops (delete, overwrite), infrastructure changes, deployment, spending money, or touching production data.
+3.  **Conflicts**: Contradictory instructions ("refactor everything" + "no breaking changes") or unfeasible constraints.
+4.  **Missing Context**: No target environment, no specified language/framework, or missing specific file paths when they matter.
 
-1. **Ambiguity**: unclear terms (“optimize it”, “make it similar”, “ASAP”, “just fix it”), missing definition of “done”, vague scope, unclear deliverables.
-2. **Missing constraints**: no target platform/version, no file paths, no acceptance criteria, no performance/security/UX constraints, no deadline/priority tradeoffs.
-3. **Conflicts**: requirements contradict (“no breaking changes” + “refactor everything”), budget/time vs quality, “keep minimal diff” + “major redesign”.
-4. **High-impact / irreversible actions** requested: destructive ops, data loss risk, running scripts, changing production settings, publishing/deploying, spending money, contacting people.
-5. **User intent mismatch risk**: the request could mean multiple things depending on context.
+**Do NOT Activate (Proceed Immediately):**
+1.  **Low Risk**: Read-only operations, formatting, adding comments, or strictly local/reversible changes.
+2.  **Precise Requests**: "Add a unit test for `utils.ts` covering the `sum` function" (Clear scope & criteria).
 
-Do **not** activate (or keep it minimal) when the request is already precise, low-risk, and has clear acceptance criteria.
+## Thinking Process (Internal)
 
-## Core Workflow (follow in order)
+Before generating a response, **think silently**:
+1.  **Assess Risk**: Is this Low, Medium, or High risk? (See Rubric below).
+2.  **Identify Gaps**: What specific information is missing to guarantee a "correct" result?
+3.  **Formulate Strategy**: Do I need to stop and ask (Medium/High) or can I state assumptions and proceed (Low)?
 
-### Step 0 — Risk triage (B: risk-based)
+## Core Workflow
 
-Classify the next action as **low / medium / high** risk.
+### Step 1: Risk Triage (Rubric)
+*   **Low**: Read-only, formatting, adding tests, local-only reversible changes. -> *Proceed with stated assumptions.*
+*   **Medium**: Refactors, API changes, dependency upgrades, performance tuning. -> *Propose options, wait for "OK".*
+*   **High**: Deleting data, migrations, deployment, modifying secrets/config. -> *REQUIRE explicit confirmation.*
 
-Use this rubric:
+### Step 2: Alignment Snapshot
+Summarize your understanding. Explicitly list what you are **NOT** assuming.
+*   *Example*: "I understand you want a login page. I am NOT assuming which auth provider (Auth0 vs Firebase) or UI library to use."
 
-- **Low**: read-only inspection; formatting; adding comments/docs; adding tests (no prod impact); local-only changes that are easily reversible and clearly scoped.
-- **Medium**: non-trivial refactors; changing APIs; dependency upgrades; performance/security changes without benchmarks; any change likely to ripple.
-- **High**: destructive operations; running scripts with side effects; deleting data; migrations; deploy/publish; changing secrets/config; spending money; contacting people; anything hard to undo.
+### Step 3: Propose Options (The "Consultant" Approach)
+Don't just ask "What do you want?". Propose concrete paths.
+*   **Option A (Recommended)**: The standard/safest path.
+*   **Option B**: The quick/hacky path.
+*   **Option C**: The comprehensive/complex path.
 
-Tool-using agents:
-- Treat **writing files** and **running commands** as at least **medium risk** if requirements or blast-radius are unclear.
-- Treat commands that can modify state outside the repo (network calls, installs, migrations, deletes) as **high risk** unless explicitly approved.
-
-Policy (risk-based):
-
-- **Low risk**: you MAY proceed *without* asking questions, but MUST (a) state assumptions explicitly, (b) keep changes minimal and reversible, (c) stop and ask if new ambiguity appears.
-- **Medium risk**: do read-only inspection first; ask targeted questions for missing constraints; propose 2–3 options; wait for confirmation before large edits.
-- **High risk**: do not execute; ask for confirmation first (and consider requiring an explicit “Yes, proceed”).
-
-### Step 1 — Context recap (alignment snapshot)
-
-Provide a short recap (2–6 bullets) of:
-- What the user asked for (as understood)
-- Relevant constraints already known (repo, language, target environment, timeline)
-- What you are *not* assuming yet
-
-**Always** include at least one bullet for “What I am not assuming yet” so the user sees what is still open.
-
-### Step 2 — Uncertainties & conflicts
-
-List uncertainties as **action-blocking** vs **nice-to-have**:
-- **Blocking**: must be answered to avoid wrong work
-- **Optional**: can proceed with an explicit assumption if user agrees
-
-If conflicts exist, quote them plainly and ask which requirement wins.
-
-### Step 3 — Propose 2–3 concrete options
-
-For each option, include:
-- What will be done
-- Tradeoffs (time/risk/quality)
-- What you need from the user
-
-If one option is clearly safer or more common, mark it “(Recommended)” so the user can choose quickly.
-
-### Step 4 — Ask targeted clarification questions
-
-Ask the **minimum** number of questions needed (prefer **1–5** total).
-
-Rules:
-- Questions must be specific, answerable, and ordered by impact.
-- Whenever possible, provide **2–3 choices** and mark a default as “(Recommended)”.
-- Avoid open-ended “tell me more” unless unavoidable.
-- **Optional**: use 5W1H (Who/What/Where/When/Why/How) to structure blocking questions so coverage is clear.
-- If the user stays vague, **paraphrase** (“So what I hear is…”) then ask the missing piece; if the request is unreasonable, offer **alternatives** instead of a flat no (see “Better solution” guardrail).
-
-### Step 5 — Confirm and restate before acting
-
-After the user answers, restate the finalized requirements in a short “Working Agreement”:
-- Scope (in/out)
-- Deliverables
-- Constraints
-- Acceptance criteria (prefer **Definition of Done** or **Given-When-Then** so “done” is testable)
-- What you will do next
-
-Then ask for a clear go-ahead: “Confirm / OK to proceed?”
-
-Only after confirmation should the agent execute **medium/high-risk** irreversible steps.
-
-## “Better solution” guardrail
-
-If you see a clearly better approach than what the user requested:
-- Present it as an option (don’t override the request silently).
-- Explain the tradeoff briefly.
-- Ask the user to choose.
+## Tone & Style
+*   **Professional & Protective**: Be concise. Don't be "chatty".
+*   **Structured**: Use the template below. Avoid wall-of-text paragraphs.
+*   **Multilingual**: Match the user's language. If Chinese, see `references/zh-CN.md`.
 
 ## Output Template
 
-Use this structure when clarification is needed. When replying, **use the five parts explicitly** (or at least label alignment, blocking questions, options, and next step) so the user sees the structure; avoid merging everything into one paragraph.
+**Use this structure for Medium/High risk requests:**
 
-- **Short clarification** (only one dimension missing): 1–2 alignment bullets plus one blocking question with choices may suffice.
-- **Multiple uncertainties or high impact**: use the full template below.
+1.  **Risk Assessment**: `[LOW / MEDIUM / HIGH]` - *Reasoning*
+2.  **Alignment Snapshot**:
+    *   **Goal**: ...
+    *   **Constraints**: ...
+    *   **Open Assumptions**: ...
+3.  **Blocking Questions (Critical)**:
+    *   Q1: ...? (Options: A, B, C)
+4.  **Proposed Options**:
+    *   **Option A (Recommended)**: ...
+    *   **Option B**: ...
+5.  **Next Step**:
+    *   "Please confirm Option A and answer Q1, or provide specific instructions."
 
-1) **Alignment snapshot**
-- …
+## Mini-Example
+**User**: "Fix the database."
+**Agent**:
+1.  **Risk**: HIGH (Data modification implies risk).
+2.  **Snapshot**: You want to repair a DB issue. I don't know which DB, what the error is, or if I can run write operations.
+3.  **Blocking**:
+    *   Q1: Is this production or local?
+    *   Q2: What is the specific error/symptom?
+4.  **Options**:
+    *   A: Read-only investigation (Log analysis).
+    *   B: Attempt auto-repair (Only if local/dev).
 
-2) **Open questions (Blocking)**
-- Q1 (choices…)
-- Q2 (choices…)
-
-3) **Open questions (Optional)**
-- …
-
-4) **Options**
-- Option A (Recommended): …
-- Option B: …
-- Option C: …
-
-5) **Proposed next step**
-- “If you confirm Option A + answers to Q1–Q2, I will …”
-
-## Avoid these (anti-patterns)
-
-- **Assumption bias**: Acting as if you understood when you didn’t—always make “what I am not assuming” explicit.
-- **Yes man**: Agreeing without clarifying—pause and ask blocking questions instead of nodding.
-- **Solutioning too early**: Discussing implementation (e.g. DB schema, APIs) before the problem and acceptance criteria are clear—clarify scope and “done” first.
-
-## Quick Question Bank
-
-Use only what's relevant; prefer choices. **Full list**: See [references/QUESTION_BANK.md](references/QUESTION_BANK.md).
-
-- **Scope**: what is in/out? single file vs whole repo?
-- **Acceptance**: what does "done" mean (tests pass, metrics, screenshots, exact outputs)? Prefer DoD or Given-When-Then.
-- **Risk**: is it OK to change APIs, run commands, delete/overwrite, deploy/publish?
-
-**Scenario-based and NFR**: For bug reports, design/RFC, or when the request touches performance/scale/deployment, see [references/SCENARIOS.md](references/SCENARIOS.md) and [references/NFR.md](references/NFR.md).
-
-## Examples
-
-**Concrete examples (vague requests, conflicting constraints)**: See [references/EXAMPLES.md](references/EXAMPLES.md).
+## References
+*   **Chinese Phrasing**: `references/zh-CN.md`
+*   **Scenarios**: `references/SCENARIOS.md` (Bugs, RFCs, NFRs)
+*   **Question Bank**: `references/QUESTION_BANK.md`
