@@ -2,7 +2,7 @@
   "name": "clarify-first-skills",
   "version": "1.0.0",
   "description": "An AI Agent Skill that enforces a 'Risk Triage' protocol to prevent hallucination and destructive actions through proactive clarification.",
-  "main": "skills/clarify-first/SKILL.md",
+  "main": "skill.md",
   "keywords": [
     "ai",
     "agent-skills",
