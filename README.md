@@ -1,6 +1,13 @@
 # Clarify First
 
-**Stop AI from guessing.** An [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) that makes Claude and Cursor pause on vague or high-impact requests, ask a few targeted questions, and get your confirmation before changing files or running commands.
+[![License](https://img.shields.io/github/license/DmiyDing/clarify-first-skills)](./LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/DmiyDing/clarify-first-skills/pulls)
+[![Cursor Compatible](https://img.shields.io/badge/Cursor-Compatible-blue)](https://cursor.com)
+[![Claude Code](https://img.shields.io/badge/Claude--Code-Compatible-orange)](https://platform.claude.com)
+
+**Stop AI from guessing. Transform your Agent into a Technical Partner.**
+
+Clarify First is a defensive [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) that enforces a **Risk Triage** protocol. It makes Claude, Cursor, and other agents pause on vague, conflicting, or high-impact requests to align on scope and safety *before* changing files or running commands.
 
 [中文](./README.zh-CN.md) · **License:** [Apache-2.0](./LICENSE)
 
@@ -8,7 +15,12 @@
 
 ## Why
 
-AI coding assistants often **guess and proceed** when your request is ambiguous. The result: wrong edits, rework, and lost trust. Clarify First adds a risk-based gate: when the request is unclear or risky, the agent pauses, summarizes what it understands, proposes options, and waits for your go-ahead before acting.
+AI coding assistants often **guess and proceed** when your request is ambiguous. The result: incorrect refactors, broken dependencies, and lost trust.
+
+Clarify First adds a strategic gate:
+*   🛑 **Prevents "Guess-and-Run":** No more undoing massive, incorrect edits.
+*   🛡️ **Safety Guardrails:** Stops accidental production deployments or data deletions.
+*   🤝 **Better Alignment:** Forces the agent to summarize assumptions and propose options (A/B/C) like a human senior engineer.
 
 ## Example
 

@@ -1,6 +1,13 @@
-# Clarify First
+# Clarify First (先澄清，再执行)
 
-**先澄清，再执行。** 一个 [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)，让 Claude、Cursor 等在遇到模糊或高风险请求时先暂停，问清关键问题并在你确认后再改代码或执行命令。
+[![License](https://img.shields.io/github/license/DmiyDing/clarify-first-skills)](./LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/DmiyDing/clarify-first-skills/pulls)
+[![Cursor Compatible](https://img.shields.io/badge/Cursor-Compatible-blue)](https://cursor.com)
+[![Claude Code](https://img.shields.io/badge/Claude--Code-Compatible-orange)](https://platform.claude.com)
+
+**拒绝盲目猜测，让 AI 成为你的技术合伙人。**
+
+Clarify First 是一个防御性的 [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)，它引入了一套 **风险分类协议 (Risk Triage)**。它让 Claude、Cursor 等 Agent 在面对模糊、冲突或高风险请求时，先停下来与你对齐目标和方案，避免在执行错误后再去返工。
 
 [English](./README.md) · **协议：** [Apache-2.0](./LICENSE)
 
@@ -8,7 +15,12 @@
 
 ## 为什么需要
 
-AI 编程助手在需求不清时常常**猜着做**，结果就是改错、返工和信任损耗。Clarify First 加了一道「风险分级」的闸门：当请求模糊或风险较高时，agent 会先暂停、梳理理解、给出选项，并在你明确同意后再动手。
+AI 编程助手在需求不清时常常 **“猜着做”**，结果就是改错、返工和信任损耗。
+
+Clarify First 增加了一个战略性关卡：
+*   🛑 **防止“盲目执行”**：不再需要撤回大规模的错误修改。
+*   🛡️ **安全护栏**：防止误删生产数据或误触发部署流程。
+*   🤝 **深度对齐**：强制 Agent 像资深工程师一样总结假设并提供多套方案（A/B/C）供你选择。
 
 ## 效果对比
 

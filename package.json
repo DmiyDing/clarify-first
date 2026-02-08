@@ -1,0 +1,26 @@
+{
+  "name": "clarify-first-skills",
+  "version": "1.0.0",
+  "description": "An AI Agent Skill that enforces a 'Risk Triage' protocol to prevent hallucination and destructive actions through proactive clarification.",
+  "main": "skills/clarify-first/SKILL.md",
+  "keywords": [
+    "ai",
+    "agent-skills",
+    "cursor-rules",
+    "prompt-engineering",
+    "ai-safety",
+    "mcp",
+    "claude-code",
+    "alignment"
+  ],
+  "author": "DmiyDing",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DmiyDing/clarify-first-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DmiyDing/clarify-first-skills/issues"
+  },
+  "homepage": "https://github.com/DmiyDing/clarify-first-skills#readme"
+}
