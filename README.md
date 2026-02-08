@@ -36,12 +36,10 @@ Clarify First adds a strategic gate:
 **Cursor, Claude Code, and other clients that support Agent Skills:**
 
 ```bash
-npx -y skills add DmiyDing/clarify-first-skills --skill clarify-first
+npx -y skills add DmiyDing/clarify-first-skills
 ```
 
 Restart your client after installation. If the skill doesn’t auto-trigger, say: *"Use the clarify-first skill."*
-
-**Troubleshooting (Cursor):** If the skill doesn’t appear, ensure `~/.cursor/skills/clarify-first/` is a real directory (not a symlink) and contains `SKILL.md`. Reinstall with "Copy" instead of "Symlink" if needed.
 
 **Codex (AGENTS.md):** To bake the behavior into a repo or global config, add the [snippet below](#codex-agentsmd-snippet) to `AGENTS.override.md` or `AGENTS.md`.
 
@@ -59,11 +57,11 @@ The agent will then align on scope, ask 1–5 targeted questions (with choices w
 - **Medium risk** (refactors, API changes, etc.): the agent inspects first, proposes 2–3 options, asks blocking questions, and waits for confirmation before larger edits.
 - **High risk** (deletes, deploy, secrets, etc.): the agent requires explicit confirmation (e.g. *"Yes, proceed"*) before taking action.
 
-Details and workflows are in the skill body: `skills/clarify-first/SKILL.md`.
+Details and workflows are in the skill body: `SKILL.md`.
 
 ## Compatibility
 
-- **Agent Skills**: This repo follows the [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) convention (Anthropic). The skill is a directory with a `SKILL.md` (YAML frontmatter + markdown). The agent uses the `description` field to decide when to load it.
+- **Agent Skills**: This repo follows the [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) convention (Anthropic). The skill consists of a `SKILL.md` (YAML frontmatter + markdown) at the root. The agent uses the `description` field to decide when to load it.
 - **Clients**: Cursor, Claude Code, Codex, and any client that supports loading Agent Skills from a GitHub repo or local path.
 
 ### Codex AGENTS.md snippet
@@ -86,7 +84,7 @@ If you see a better approach than requested, present it as an option and ask the
 ## Repository structure
 
 ```
-skills/clarify-first/
+.
 ├── SKILL.md           # Skill definition, workflow, anti-patterns
 └── references/
     ├── zh-CN.md       # Chinese phrasing templates

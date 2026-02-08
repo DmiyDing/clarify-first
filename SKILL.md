@@ -1,6 +1,9 @@
 ---
 name: clarify-first
 description: Protective guardrail for ambiguity and high-risk actions. Triggers when requests are vague, conflict-ridden, or high-impact (e.g., destructive ops, deployment, spending). Enforces a "Risk Triage -> Align -> Act" workflow to prevent errors and side effects.
+license: Apache-2.0
+metadata:
+  author: DmiyDing
 ---
 
 # Clarify First (Agent Skill)

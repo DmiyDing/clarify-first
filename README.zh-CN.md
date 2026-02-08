@@ -36,12 +36,10 @@ Clarify First 增加了一个战略性关卡：
 **支持 Agent Skills 的 Cursor、Claude Code 等：**
 
 ```bash
-npx -y skills add DmiyDing/clarify-first-skills --skill clarify-first
+npx -y skills add DmiyDing/clarify-first-skills
 ```
 
-安装后重启客户端。若未自动触发，可在对话中说：「使用 clarify-first skill」。
-
-**排查（Cursor）：** 若看不到该 skill，请确认 `~/.cursor/skills/clarify-first/` 是真实目录（非软链接）且内含 `SKILL.md`；必要时用「复制」而非「软链接」重新安装。
+安装后重启客户端。若未自动触发，可在对话中说：「使用 clarify-first 技能」。
 
 **Codex（AGENTS.md）：** 若希望在某仓库或全局固定该行为，可将 [下方片段](#codex-agentsmd-片段) 写入 `AGENTS.override.md` 或 `AGENTS.md`。
 
@@ -59,11 +57,11 @@ Agent 会先对齐范围、提出 1–5 个关键问题（尽量给选项），�
 - **中风险**（重构、改接口等）：agent 先只读检查，给出 2–3 个选项、问清阻塞问题，确认后再做较大改动。
 - **高风险**（删除、部署、改密钥等）：agent 会要求你显式确认（如「可以，执行」）后再执行。
 
-详细流程见技能本体：`skills/clarify-first/SKILL.md`。
+详细流程见技能本体：`SKILL.md`。
 
 ## 兼容性
 
-- **Agent Skills**：本仓库遵循 [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) 约定（Anthropic）。技能即包含 `SKILL.md`（YAML frontmatter + 正文）的目录，agent 根据 `description` 决定何时加载。
+- **Agent Skills**：本仓库遵循 [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) 约定（Anthropic）。技能核心位于根目录的 `SKILL.md`（YAML frontmatter + 正文）。Agent 会根据 `description` 字段决定何时加载。
 - **客户端**：Cursor、Claude Code、Codex 以及任何支持从 GitHub 或本地路径加载 Agent Skills 的客户端。
 
 ### Codex AGENTS.md 片段
@@ -86,7 +84,7 @@ If you see a better approach than requested, present it as an option and ask the
 ## 仓库结构
 
 ```
-skills/clarify-first/
+.
 ├── SKILL.md           # 技能定义、工作流、反模式
 └── references/
     ├── zh-CN.md       # 中文措辞参考
