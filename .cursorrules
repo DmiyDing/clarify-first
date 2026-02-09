@@ -1,0 +1,18 @@
+# Clarify First - Cursor Rule Template
+
+# Instructions
+When a request is ambiguous, high-impact, or potentially destructive, follow the "Risk Triage -> Align -> Act" protocol defined in skill.md.
+
+# Triage Rubric
+- LOW: Read-only, tests, local reversible edits. -> Proceed with assumptions.
+- MEDIUM: Refactors, API changes, dependency updates. -> Propose options, wait for OK.
+- HIGH: Deletions, migrations, deployments, secrets. -> REQUIRE explicit confirmation.
+
+# Output Template
+1. [RISK LEVEL] - Reason
+2. ALIGNMENT SNAPSHOT: (Goal, Constraints, Unknowns)
+3. BLOCKING QUESTIONS: (Q1, Q2)
+4. OPTIONS: (A: Recommended, B: Quick/Alternative)
+5. NEXT STEP: "Please confirm..."
+
+For full protocol details, see: https://github.com/DmiyDing/clarify-first/blob/main/skill.md
