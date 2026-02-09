@@ -33,13 +33,7 @@ Clarify First adds a strategic gate:
 
 ## Install
 
-**Via Smithery (Recommended):**
-
-```bash
-npx -y skills add DmiyDing/clarify-first
-```
-
-**Manual installation for Cursor/Claude Code:**
+**For Cursor, Claude Code, and other clients that support Agent Skills:**
 
 ```bash
 npx -y skills add DmiyDing/clarify-first-skills

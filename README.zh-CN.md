@@ -33,13 +33,7 @@ Clarify First 增加了一个战略性关卡：
 
 ## 安装
 
-**通过 Smithery 安装 (推荐):**
-
-```bash
-npx -y skills add DmiyDing/clarify-first
-```
-
-**Cursor/Claude Code 手动安装:**
+**支持 Agent Skills 的 Cursor、Claude Code 等：**
 
 ```bash
 npx -y skills add DmiyDing/clarify-first-skills
