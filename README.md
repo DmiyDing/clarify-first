@@ -2,7 +2,6 @@
 
 [![License](https://img.shields.io/github/license/DmiyDing/clarify-first)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/DmiyDing/clarify-first/pulls)
-[![Smithery](https://img.shields.io/badge/Smithery-Available-orange)](https://smithery.ai/skills/DmiyDing/clarify-first)
 [![Cursor Compatible](https://img.shields.io/badge/Cursor-Compatible-blue)](https://cursor.com)
 
 **Stop AI from guessing. Transform your Agent into a Technical Partner.**
@@ -21,6 +20,8 @@ Clarify First adds a strategic gate:
 *   🛑 **Prevents "Guess-and-Run":** No more undoing massive, incorrect edits.
 *   🛡️ **Safety Guardrails:** Stops accidental production deployments or data deletions.
 *   🤝 **Better Alignment:** Forces the agent to summarize assumptions and propose options (A/B/C) like a human senior engineer.
+
+> **Note:** This is a platform-agnostic standard implementation. While originally designed for Claude and Cursor, it follows the open [Agent Skills specification](https://agentskills.io/specification), making it compatible with any future agentic tool that supports the standard.
 
 ## Example
 
@@ -57,11 +58,11 @@ The agent will then align on scope, ask 1–5 targeted questions (with choices w
 - **Medium risk** (refactors, API changes, etc.): the agent inspects first, proposes 2–3 options, asks blocking questions, and waits for confirmation before larger edits.
 - **High risk** (deletes, deploy, secrets, etc.): the agent requires explicit confirmation (e.g. *"Yes, proceed"*) before taking action.
 
-Details and workflows are in the skill body: `skill.md`.
+Details and workflows are in the skill body: `clarify-first/SKILL.md`.
 
 ## Compatibility
 
-- **Agent Skills**: This repo follows the [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) convention (Anthropic). The skill consists of a `skill.md` (YAML frontmatter + markdown) at the root.
+- **Agent Skills**: This repo follows the [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) convention (Anthropic). The skill lives in the `clarify-first/` directory: `clarify-first/SKILL.md` (YAML frontmatter + Markdown).
 - **Clients**: Cursor, Claude Code, Codex, and any client that supports loading Agent Skills from a GitHub repo or local path.
 
 ### Codex AGENTS.md snippet
@@ -85,16 +86,21 @@ If you see a better approach than requested, present it as an option and ask the
 
 ```
 .
-├── skill.md           # Skill definition, workflow, anti-patterns
-└── references/
-    ├── zh-CN.md       # Chinese phrasing templates
-    ├── EXAMPLES.md    # Example inputs and expected behavior
-    ├── QUESTION_BANK.md
-    ├── SCENARIOS.md   # Bug report, design/RFC, feature-scope scenarios
-    └── NFR.md         # Non-functional requirements clarification checklist
+├── clarify-first/
+│   ├── SKILL.md          # Core skill definition (Markdown)
+│   └── references/       # Context files loaded on demand
+├── tooling/              # Maintenance scripts
+├── .cursorrules          # Cursor rule template (condensed)
+├── CHANGELOG.md          # Version history
+└── CONTRIBUTING.md       # Contribution guide
 ```
 
-The skill uses progressive disclosure: the agent loads `skill.md` when the skill triggers, and only opens `references/*` when needed.
+## Standards & Compliance
+This skill follows the [Agent Skills specification](https://agentskills.io/specification) and is compatible with:
+*   [Claude Code](https://claude.ai)
+*   [Cursor](https://cursor.com)
+
+The skill uses progressive disclosure: the agent loads `clarify-first/SKILL.md` when the skill triggers, and only opens `references/*` when needed.
 
 ## Contributing and license
 

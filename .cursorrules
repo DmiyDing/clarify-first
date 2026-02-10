@@ -4,9 +4,14 @@
 When a request is ambiguous, high-impact, or potentially destructive, follow the "Risk Triage -> Align -> Act" protocol defined in skill.md.
 
 # Triage Rubric
-- LOW: Read-only, tests, local reversible edits. -> Proceed with assumptions.
+- LOW: Read-only, tests, **creating new non-conflicting files**, local reversible edits. -> Proceed with assumptions.
 - MEDIUM: Refactors, API changes, dependency updates. -> Propose options, wait for OK.
-- HIGH: Deletions, migrations, deployments, secrets. -> REQUIRE explicit confirmation.
+- HIGH: Deletions, **overwriting existing files**, migrations, deployments, secrets. -> REQUIRE explicit confirmation.
+
+# Protocol
+1. **Assess Risk**: Low/Medium/High.
+2. **Align**: Ask blocking questions (max 2 rounds).
+3. **Act**: Execute once aligned or if risk is Low.
 
 # Output Template
 1. [RISK LEVEL] - Reason
@@ -15,4 +20,11 @@ When a request is ambiguous, high-impact, or potentially destructive, follow the
 4. OPTIONS: (A: Recommended, B: Quick/Alternative)
 5. NEXT STEP: "Please confirm..."
 
-For full protocol details, see: https://github.com/DmiyDing/clarify-first/blob/main/skill.md
+# Anti-Patterns
+- Don't ask about trivial steps.
+- HIGH RISK: If user says "Just do it", verify ONCE more before executing.
+- MEDIUM RISK: If user says "Just do it", proceed immediately.
+
+For full protocol details, see clarify-first/SKILL.md in the project root (or https://github.com/DmiyDing/clarify-first/blob/main/clarify-first/SKILL.md if viewing remotely).
+
+# Synced with skill.md v1.1.0

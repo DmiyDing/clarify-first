@@ -2,7 +2,6 @@
 
 [![License](https://img.shields.io/github/license/DmiyDing/clarify-first)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/DmiyDing/clarify-first/pulls)
-[![Smithery](https://img.shields.io/badge/Smithery-Available-orange)](https://smithery.ai/skills/DmiyDing/clarify-first)
 [![Cursor Compatible](https://img.shields.io/badge/Cursor-Compatible-blue)](https://cursor.com)
 
 **拒绝盲目猜测，让 AI 成为你的技术合伙人。**
@@ -57,11 +56,11 @@ Agent 会先对齐范围、提出 1–5 个关键问题（尽量给选项），�
 - **中风险**（重构、改接口等）：agent 先只读检查，给出 2–3 个选项、问清阻塞问题，确认后再做较大改动。
 - **高风险**（删除、部署、改密钥等）：agent 会要求你显式确认（如「可以，执行」）后再执行。
 
-详细流程见技能本体：`skill.md`。
+详细流程见技能本体：`clarify-first/SKILL.md`。
 
 ## 兼容性
 
-- **Agent Skills**：本仓库遵循 [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) 约定（Anthropic）。技能核心位于根目录的 `skill.md`。
+- **Agent Skills**：本仓库遵循 [Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) 约定（Anthropic）。技能核心位于 `clarify-first/` 目录下的 `clarify-first/SKILL.md`。
 - **客户端**：Cursor、Claude Code、Codex 以及任何支持从 GitHub 或本地路径加载 Agent Skills 的客户端。
 
 ### Codex AGENTS.md 片段
@@ -85,16 +84,16 @@ If you see a better approach than requested, present it as an option and ask the
 
 ```
 .
-├── skill.md           # 技能定义、工作流、反模式
-└── references/
-    ├── zh-CN.md       # 中文措辞参考
-    ├── EXAMPLES.md    # 示例输入与预期行为
-    ├── QUESTION_BANK.md
-    ├── SCENARIOS.md   # Bug 报告、设计/RFC、需求范围等场景
-    └── NFR.md         # 非功能性需求澄清清单
+├── clarify-first/
+│   ├── SKILL.md          # 技能定义（Markdown）
+│   └── references/       # 按需加载的上下文文件
+├── tooling/              # 维护脚本
+├── .cursorrules          # Cursor 规则模板（精简版）
+├── CHANGELOG.md          # 版本历史
+└── CONTRIBUTING.md       # 贡献指南
 ```
 
-技能采用渐进式披露：agent 在触发时加载 `skill.md`，仅在需要时打开 `references/*`。
+技能采用渐进式披露：agent 在触发时加载 `clarify-first/SKILL.md`，仅在需要时打开 `references/*`。
 
 ## 参与与协议
 
