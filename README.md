@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/github/license/DmiyDing/clarify-first)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/DmiyDing/clarify-first/pulls)
+[![Spec](https://img.shields.io/badge/Spec-Agent--Skills-blueviolet)](https://agentskills.io/specification)
 [![Cursor Compatible](https://img.shields.io/badge/Cursor-Compatible-blue)](https://cursor.com)
 
 **Stop AI from guessing. Transform your Agent into a Technical Partner.**
