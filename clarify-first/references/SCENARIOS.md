@@ -1,8 +1,8 @@
 # Clarify First — Scenarios
 
-> **Version**: 1.2.0  
-> **Last Updated**: 2026-02-12  
-> **Compatibility**: Matches clarify-first/SKILL.md v1.2.0 (includes Assumption Weight Classification, Atomic Step Enforcement, Rollback First Principle)
+> **Version**: 1.3.0  
+> **Last Updated**: 2026-02-26  
+> **Compatibility**: Matches clarify-first/SKILL.md v1.3.0 (includes non-negotiable clarification gate, progressive execution, rollback-first planning, and plan-amendment boundary rules)
 
 ## 1. Bug Reports
 *   **Missing Repro**: User says "It crashes" but gives no logs/code. -> **Ask for logs.**
@@ -30,13 +30,24 @@
 *   **Weight = 2 (IMMEDIATELY TRIGGER)**:
     *   **Environment** (dev vs prod, local vs remote)
     *   **Dependencies** (which packages are available, which versions)
+    *   **Cross-File Coupling** (modifying more than 3 files across modules/components)
 *   **Weight = 1 (Count normally)**:
     *   Framework/library choice
     *   File location/structure
     *   Naming conventions
-*   **Rule**: If ANY assumption has weight=2, trigger immediately. Otherwise, if total count > 2, trigger.
+*   **Rule**: If ANY critical assumption has weight=2, trigger immediately. Otherwise, if weighted total >= 3, trigger.
 
-## 6. Atomic Step Enforcement (MEDIUM/HIGH Risk)
+## 5.5 Contextual Risk Modifier
+*   **Escalation Example**: "Add one log line in `src/main.go`" may start as LOW, but if `main.go` is core entrypoint/high centrality, escalate to MEDIUM for confirmation.
+*   **De-escalation Example**: "Add helper in `scripts/tmp_probe.ts`" may start as MEDIUM, but can de-escalate only when isolated, reversible, and assumption-free.
+*   **Security Override**: If requested approach violates architecture/security baseline (for example client-side DB credentials), force HIGH hard stop.
+
+## 6. Fast Track Priority Rule
+*   **Explicit Scope Overrides Vague Verbs**: If path + anchor (line/symbol/snippet) + acceptance criteria are explicit, verbs like "fix" do not block Fast Track.
+*   **Example**: "Fix timeout bug in `src/auth.ts` line 42 from 30s to 60s. Skip Plan." -> Can Fast Track.
+*   **Boundary**: Fast Track is invalid if unresolved ambiguity remains after audit.
+
+## 7. Atomic Step Enforcement (MEDIUM/HIGH Risk)
 For MEDIUM/HIGH risk tasks, follow two-phase approach:
 1.   **Phase 1: Execution Plan** (MANDATORY)
     *   List files to create/modify
@@ -47,3 +58,44 @@ For MEDIUM/HIGH risk tasks, follow two-phase approach:
 2.   **Phase 2: Code Generation** (Only after plan confirmation)
     *   Generate actual code
     *   If user modifies plan, regenerate plan (not code) and confirm again
+    *   If plan has 2+ dependent HIGH-risk actions, execute step-by-step with confirmation after each step
+    *   Use a short Plan Signature (for example `Plan-ID: 7A2F`) to anchor each progressive step
+    *   Do not edit/create files outside approved Impact Matrix; request Plan Amendment for newly discovered files
+    *   Classify newly discovered changes:
+        *   **Derivative Adaptation** (type/interface sync, compile-only adapters): batch into one amendment request (still requires confirmation)
+        *   **Logic Expansion** (new dependency/module/service/infra scope): hard stop and explicit amendment approval
+
+## 8. Clarification Persistence (No Silent Auto-Act)
+*   If user remains vague after 2 clarification rounds, summarize unresolved blockers and request explicit decision.
+*   Do NOT execute MEDIUM/HIGH-risk changes until confirmation is explicit.
+*   "Skip triage" or "don't ask" does not bypass unresolved ambiguity checks.
+*   If user cannot answer blockers, switch to Pathfinder Mode: propose read-only diagnostics or a verification demo.
+*   If read-only probing is insufficient, propose **Sandbox Validation** as an explicit option: isolated branch/worktree probe + minimal verification unit, with confirmation required before running mutating commands.
+*   For option questions, include a short tradeoff note (Speed/Cost/Safety) to reduce decision errors.
+
+## 9. State Checkpoint + Privacy Redaction
+*   **State Checkpoint**: Before execution after long planning threads, emit `[Recalling Execution Plan Summary: ...]`.
+*   **Redaction Rule**: Never print raw API keys, tokens, passwords, or PII in context/audit output; mask as `***`.
+
+## 10. Shift-Left Environment Validation
+*   Before asking stack/dependency questions, inspect manifest files (`package.json`, `requirements.txt`, `pyproject.toml`, `go.mod`, etc.) if available.
+*   Ask the user only when manifests are missing, conflicting, or ambiguous.
+
+## 11. Structured Risk Header
+*   Prefer machine-parseable risk header format:
+  *   `[RISK: HIGH | TRIGGER: env-assumption | CONFIDENCE: 60% | PLAN-ID: 7A2F]`
+
+## 11.5 Final Reconciliation
+*   After MEDIUM/HIGH execution, emit a compact reconciliation:
+  *   Plan-ID
+  *   Approved vs actual changed files
+  *   Whether amendment occurred
+  *   Rollback validity status
+
+## 12. Multi-Agent Handoff
+*   When context is constrained, emit compact approved payload with `planId`, `risk`, `approvedFiles`, `rollbackStrategy`, and `nextStep`.
+*   For scoped handoff, optionally include `scopeTag`, `intentVector`, and `contextPointers`.
+
+## 13. Meta-Skill Conflict Precedence
+*   If another skill asks for silent bulk execution, Clarify First remains terminal guardrail for ambiguity/high-risk gates.
+*   Agent should explicitly state precedence when conflict occurs: "Guardrail precedence applied."

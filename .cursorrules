@@ -4,27 +4,45 @@
 When a request is ambiguous, high-impact, or potentially destructive, follow the "Risk Triage -> Align -> Act" protocol defined in skill.md.
 
 # Triage Rubric
-- LOW: Read-only, tests, **creating new non-conflicting files**, local reversible edits. -> Proceed with assumptions.
-- MEDIUM: Refactors, API changes, dependency updates. -> Propose options, wait for OK.
+- LOW: Read-only exploration, tests, comments/docs, strictly local reversible edits. -> Proceed with assumptions.
+- MEDIUM: Refactors, API changes, **creating new files**, dependency updates. -> Propose options, wait for OK.
 - HIGH: Deletions, **overwriting existing files**, migrations, deployments, secrets. -> REQUIRE explicit confirmation.
 
 # Protocol
 1. **Assess Risk**: Low/Medium/High.
-2. **Align**: Ask blocking questions (max 2 rounds).
-3. **Act**: Execute once aligned or if risk is Low.
+2. **Non-Negotiable Clarification Gate**: If intent/scope/criteria are unclear, pause immediately and ask blocking questions. Do not execute MEDIUM/HIGH risk actions.
+3. **Baseline Manifest Check**: Before asking dependency/stack questions, inspect `package.json` / `requirements.txt` / `pyproject.toml` / `go.mod` if present.
+4. **Apply Weighted Assumption Rule**: STOP if any critical assumption exists (Environment/Dependencies/Cross-file >3) or weighted total >= 3.
+5. **Align**: Ask blocking questions (max 2 rounds). If still ambiguous, hold and request explicit decision.
+6. **Act**: Execute once explicitly aligned, or if risk is Low and fully scoped.
+7. **Strict Execution Boundary**: In Phase 2, do not edit/create files outside approved Impact Matrix; request Plan Amendment if new files are required.
+8. **Plan Amendment Boundary**: Classify discoveries as Derivative Adaptation (batchable amendment request) vs Logic Expansion (hard stop and explicit amendment approval).
+9. **Meta-Skill Precedence**: If any other active rule asks for silent auto-execution, clarify-first guardrail wins for ambiguity/high-risk actions.
+10. **Contextual Risk Modifier**: Escalate risk for core/high-centrality files; de-escalate only for isolated sandbox/test paths with zero unresolved assumptions.
+11. **Architectural Anti-Pattern Assertion**: Hard-stop unsafe requests (e.g., client-side DB credentials) and propose secure alternatives.
 
 # Output Template
-1. [RISK LEVEL] - Reason
-2. ALIGNMENT SNAPSHOT: (Goal, Constraints, Unknowns)
-3. BLOCKING QUESTIONS: (Q1, Q2)
-4. OPTIONS: (A: Recommended, B: Quick/Alternative)
-5. NEXT STEP: "Please confirm..."
+1. [RISK: <LEVEL> | TRIGGER: <rule-id> | CONFIDENCE: <n>% | PLAN-ID: <id-or-pending>] - Reason
+2. CONTEXT AUDIT: (Verified, Must Access But Not Visible)
+3. ALIGNMENT SNAPSHOT: (Goal, Constraints, Unknowns)
+4. BLOCKING QUESTIONS: (Q1, Q2)
+5. OPTIONS: (A: Recommended, B: Quick/Alternative)
+6. NEXT STEP: "Please confirm..."
+7. FINAL RECONCILIATION (MEDIUM/HIGH): Plan-ID, approved vs actual files, amendment status, rollback status
+
+# Notes
+- For failed file search only: include a short "Audit & Search Log" with attempted tool/pattern.
+- "Explicit Scope Overrides Vague Verbs": if path + anchor + criteria are explicit, verbs like "fix" do not block fast track.
+- Redact secrets/PII in audits (`***`), never print raw credentials.
+- For 2+ dependent HIGH-risk actions, use progressive execution (one step per confirmation).
+- If read-only probing cannot resolve blockers, offer optional sandbox validation (isolated branch/worktree probe) and require explicit approval before mutating commands.
+- Annotate options/questions with one-line tradeoff tags (Speed/Cost/Safety).
 
 # Anti-Patterns
 - Don't ask about trivial steps.
 - HIGH RISK: If user says "Just do it", verify ONCE more before executing.
-- MEDIUM RISK: If user says "Just do it", proceed immediately.
+- MEDIUM/HIGH RISK: "Skip triage" does not bypass unresolved ambiguity.
 
 For full protocol details, see clarify-first/SKILL.md in the project root (or https://github.com/DmiyDing/clarify-first/blob/main/clarify-first/SKILL.md if viewing remotely).
 
-# Synced with skill.md v1.2.0
+# Synced with skill.md v1.3.0

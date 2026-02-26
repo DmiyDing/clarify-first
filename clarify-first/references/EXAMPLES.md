@@ -1,19 +1,18 @@
 # Clarify First — Examples
 
-> **Version**: 1.2.0  
-> **Last Updated**: 2026-02-12  
-> **Compatibility**: Matches clarify-first/SKILL.md v1.2.0 (includes Execution Plan, Weight Classification, Fast Track, Search-First Context Audit)
+> **Version**: 1.3.0  
+> **Last Updated**: 2026-02-26  
+> **Compatibility**: Matches clarify-first/SKILL.md v1.3.0 (includes non-negotiable clarification gate, progressive execution, plan-amendment boundary classification, anti-pattern hard stop, and final reconciliation)
 
-## 1. Ambiguous Request (Medium Risk) - v1.2.0 Format
+## 1. Ambiguous Request (Medium Risk) - v1.3.0 Format
 **User**: "Optimize the code."
 **Agent**:
-> **[RISK: MEDIUM]** - "Optimize" is subjective (speed vs. readability vs. memory).
+> **[RISK: MEDIUM | TRIGGER: ambiguity-goal | CONFIDENCE: 70% | PLAN-ID: pending]** - "Optimize" is subjective (speed vs. readability vs. memory).
 >
-> **CONTEXT AUDIT & SEARCH LOG**:
+> **CONTEXT AUDIT**:
 > *   **Verified**: [Current file in context]
-> *   **Audit & Search Log** (Self-Rescue Attempts):
->     *   [Target files]: Not searched yet (need to identify hot paths first)
->   **Must Access But Not Visible**: [Need to analyze codebase structure to identify optimization targets]
+> *   **Manifest Check**: `package.json` found and reviewed (dependencies inferred before asking)
+> *   **Must Access But Not Visible**: [Need to analyze codebase structure to identify optimization targets]
 >
 > **ALIGNMENT SNAPSHOT**:
 > *   **Goal**: Improve code quality/performance.
@@ -28,20 +27,18 @@
 > *   Q2: Are there specific hot-paths to focus on?
 >
 > **PROPOSED OPTIONS**:
-> *   **Option A (Recommended)**: Refactor for readability and strict typing (safest).
-> *   **Option B**: Aggressive performance optimization (might reduce readability).
+> *   **Option A (Recommended)**: Refactor for readability and strict typing. *(Tradeoff: Speed = Medium / Cost = Low / Safety = High)*
+> *   **Option B**: Aggressive performance optimization. *(Tradeoff: Speed = High / Cost = Medium / Safety = Medium)*
 >
-> **NEXT STEP**: Please confirm Option A or clarify the goal.
+> **NEXT STEP**: Please confirm Option A or clarify the goal. I will proceed only after your explicit confirmation.
 
-## 2. Conflicting Constraints (Medium Risk) - v1.2.0 Format
+## 2. Conflicting Constraints (Medium Risk) - v1.3.0 Format
 **User**: "Refactor this to be generic, but don't change any interfaces."
 **Agent**:
-> **[RISK: MEDIUM]** - Making code "generic" usually implies changing signatures (interfaces).
+> **[RISK: MEDIUM | TRIGGER: constraint-conflict | CONFIDENCE: 74% | PLAN-ID: pending]** - Making code "generic" usually implies changing signatures (interfaces).
 >
-> **CONTEXT AUDIT & SEARCH LOG**:
+> **CONTEXT AUDIT**:
 > *   **Verified**: [Current file in context]
-> *   **Audit & Search Log** (Self-Rescue Attempts):
->     *   [Related interfaces]: Not searched yet (need to identify all affected interfaces)
 > *   **Must Access But Not Visible**: [Need to verify all call sites of current interface]
 >
 > **ALIGNMENT SNAPSHOT**:
@@ -60,16 +57,16 @@
 >
 > **NEXT STEP**: I recommend **Option A** to satisfy both constraints safely. Proceed?
 
-## 3. High Risk / Destructive (High Risk) - v1.2.0 Format with Execution Plan
+## 3. High Risk / Destructive (High Risk) - v1.3.0 Format with Execution Plan
 **User**: "Delete all users older than 1 year."
 **Agent**:
-> **[RISK: HIGH]** - Permanent data deletion.
+> **[RISK: HIGH | TRIGGER: env-assumption+destructive-op | CONFIDENCE: 55% | PLAN-ID: pending]** - Critical assumption (Environment weight=2) + destructive operation.
 >
-> **CONTEXT AUDIT & SEARCH LOG**:
-> *   **Verified**: [Database schema knowledge assumed]
+> **CONTEXT AUDIT**:
+> *   **Verified**: [Database schema knowledge assumed, config reviewed with secrets redacted: `DB_PASSWORD=***`]
 > *   **Audit & Search Log** (Self-Rescue Attempts):
->     *   [Migration scripts]: Attempted `glob_file_search` with pattern "**/migrations/*.sql" → Not found
->     *   [Backup scripts]: Attempted `grep_search` with pattern "backup" → Not found
+>     *   [Migration scripts]: Attempted [file search tool] with pattern "**/migrations/*.sql" → Not found
+>     *   [Backup scripts]: Attempted [regex search tool] with pattern "backup" → Not found
 >     *   [Database config]: Not searched yet (need user guidance)
 > *   **Must Access But Not Visible**: [Need to verify: database connection config, backup strategy, user table schema]
 >
@@ -89,7 +86,7 @@
 > **EXECUTION PLAN (Phase 1 - MANDATORY for HIGH risk)**:
 > 
 > **1. Rollback Preparation (MANDATORY "Rollback First" Principle)**:
-> *   **Git Status**: Check current branch and uncommitted changes before proceeding
+> *   **Git Status**: If shell/terminal tools are available, check current branch and uncommitted changes; otherwise ask user to confirm working tree status
 > *   **Backup Confirmation**: Verify database backup exists at `/backups/users_$(date +%Y%m%d).sql`
 > *   **Rollback Script Location**: `scripts/rollback-delete-old-users.sql` (to be created)
 > 
@@ -108,22 +105,20 @@
 > *   If hard delete: Requires backup restoration from `/backups/users_$(date +%Y%m%d).sql`
 >
 > **PROPOSED OPTIONS**:
-> *   **Option A (Recommended)**: Generate a `SELECT` count query first to verify scope, then soft delete script.
-> *   **Option B**: Generate a Soft Delete script with transaction wrapper.
-> *   **Option C**: Generate Hard Delete script (Dangerous - requires explicit confirmation).
+> *   **Option A (Recommended)**: Generate a `SELECT` count query first to verify scope, then soft delete script. *(Tradeoff: Speed = Medium / Cost = Low / Safety = High)*
+> *   **Option B**: Generate a Soft Delete script with transaction wrapper. *(Tradeoff: Speed = Medium / Cost = Medium / Safety = High)*
+> *   **Option C**: Generate Hard Delete script (Dangerous - requires explicit confirmation). *(Tradeoff: Speed = High / Cost = Low / Safety = Low)*
 >
 > **NEXT STEP**: Please confirm Q1, Q2, Q3, and review the Execution Plan above. I will NOT generate delete code until you confirm the plan.
+> **Plan Signature (after approval)**: `Plan-ID: 7A2F`
 
-## 4a. "Just Do It" Override (High Risk - Step 1) - v1.2.0 Format
+## 4a. "Just Do It" Override (High Risk - Step 1) - v1.3.0 Format
 **User**: "Yes, this is prod. Just do it, I don't care."
 **Agent**:
-> **[RISK: HIGH]** - User overrode safety check.
+> **[RISK: HIGH | TRIGGER: high-risk-override | CONFIDENCE: 68% | PLAN-ID: 7A2F]** - User attempted to bypass safety checks for a production operation.
 >
-> **CONTEXT AUDIT & SEARCH LOG**:
+> **CONTEXT AUDIT**:
 > *   **Verified**: [Environment confirmed as Production]
-> *   **Audit & Search Log** (Self-Rescue Attempts):
->     *   [Backup verification]: Attempted `grep_search` with pattern "backup" → Found references but need confirmation
->     *   [Rollback scripts]: Not searched yet (will create)
 > *   **Must Access But Not Visible**: [Backup verification, rollback scripts]
 >
 > **ALIGNMENT SNAPSHOT**:
@@ -154,15 +149,49 @@
 > ROLLBACK;    -- Safety default: rollback until explicitly committed
 > ```
 
-## 5. Fast Track Example (Medium Risk with Explicit Scope) - v1.2.0 Format
-**User**: "In `src/utils/auth.ts` line 42, change the JWT timeout from 30s to 60s. Skip Plan."
+## 4c. Progressive Execution for Dependent HIGH-Risk Actions (v1.3.0)
+**User**: "Proceed with delete -> migrate -> deploy."
 **Agent**:
-> **[RISK: MEDIUM]** - Configuration change, but explicitly scoped.
+> **[Recalling Execution Plan Summary: Delete stale users, run migration v42, deploy to production | Plan-ID: 7A2F]**
 >
-> **CONTEXT AUDIT & SEARCH LOG**:
+> **PROGRESSIVE EXECUTION ([Executing Step 1/3 of Plan 7A2F])**:
+> I will execute only Step 1 now: generate and validate delete script (no deploy yet).
+>
+> **NEXT STEP**: Confirm "Proceed Step 1" to continue. After Step 1 result, I will pause for Step 2 confirmation.
+
+## 4d. Plan Amendment Required for Out-of-Plan Discovery (v1.3.0)
+**User**: "Proceed Step 2."
+**Agent**:
+> **[RISK: HIGH | TRIGGER: strict-execution-boundary | CONFIDENCE: 82% | PLAN-ID: 7A2F]** - New required file discovered outside approved Impact Matrix.
+>
+> **DISCOVERY**: Migration step requires editing `config/feature-flags.ts`, which is NOT in approved files for Plan `7A2F`.
+>
+> **ACTION**: Stopping execution and requesting **Plan Amendment** before continuing.
+>
+> **NEXT STEP**: Approve amendment to include `config/feature-flags.ts` (A: Approve, B: Reject, C: Revise plan).
+
+## 4e. Plan Amendment Boundary Classification (v1.3.0)
+**User**: "Continue execution."
+**Agent**:
+> **[RISK: MEDIUM | TRIGGER: plan-amendment-boundary | CONFIDENCE: 79% | PLAN-ID: 7A2F]** - New changes discovered; classified before amendment.
+>
+> **DISCOVERY CLASSIFICATION**:
+> *   **Derivative Adaptation**: `src/types/auth.ts` (interface sync for compile pass)
+> *   **Logic Expansion**: add dependency `zod` for new runtime validation
+>
+> **ACTION**:
+> *   Derivative adaptation can be batched in one amendment request.
+> *   Logic expansion requires hard-stop amendment approval before continuing.
+>
+> **NEXT STEP**: Choose (A) Approve both amendments, (B) Approve derivative only and stop, (C) Cancel and re-plan.
+
+## 5. Fast Track Example (Medium Risk with Explicit Scope) - v1.3.0 Format
+**User**: "Fix timeout bug in `src/utils/auth.ts` line 42: change the JWT timeout from 30s to 60s. Skip Plan."
+**Agent**:
+> **[RISK: MEDIUM | TRIGGER: explicit-scope-fast-track | CONFIDENCE: 92% | PLAN-ID: N/A]** - Configuration change, but explicitly scoped.
+>
+> **CONTEXT AUDIT**:
 > *   **Verified**: [File path and line number specified]
-> *   **Audit & Search Log** (Self-Rescue Attempts):
->     *   [`src/utils/auth.ts`]: Located via `glob_file_search` → Found and loaded
 > *   **Must Access But Not Visible**: [None - all context available]
 >
 > **ALIGNMENT SNAPSHOT**:
@@ -170,7 +199,7 @@
 >   **Technical Assumptions**: None (file path, line number, and change specified)
 >   **Weight Count**: 0 (no assumptions needed)
 >
-> **FAST TRACK APPROVED**: Request is explicitly scoped with file path, line number, and clear change. Skipping Execution Plan per user request.
+> **FAST TRACK APPROVED**: Explicit scope overrides vague verb ("fix"): request includes file path, line number, and clear change. Skipping Execution Plan per user request.
 >
 > ```typescript
 > // [FAST-TRACKED MEDIUM RISK] - Explicitly scoped request, plan skipped per user request
@@ -178,28 +207,22 @@
 > const JWT_TIMEOUT = 60; // Changed from 30
 > ```
 
-## 6. Cross-File Coupling Weight Example with Kanban Table (v1.2.0)
+## 6. Cross-File Coupling Weight Example with Impact Matrix Table (v1.3.0)
 **User**: "Refactor the authentication logic across the codebase."
 **Agent**:
-> **[RISK: MEDIUM]** - Refactoring with potential cross-file coupling.
+> **[RISK: MEDIUM | TRIGGER: cross-file-coupling | CONFIDENCE: 72% | PLAN-ID: pending]** - Refactoring with potential cross-file coupling.
 >
-> **CONTEXT AUDIT & SEARCH LOG**:
+> **CONTEXT AUDIT**:
 > *   **Verified**: [Current file in context]
-> *   **Audit & Search Log** (Self-Rescue Attempts):
->     *   [auth.ts]: Attempted `grep_search` with pattern "auth" → Found 5 files
->     *   [user.model.ts]: Located via search → Found
->     *   [middleware/auth.ts]: Located via search → Found
->     *   [routes/auth.ts]: Located via search → Found
->     *   [config/auth.ts]: Located via search → Found
->   **Must Access But Not Visible**: [Need to load all 5 files for refactoring]
+> *   **Must Access But Not Visible**: [Need to load all 5 files for refactoring]
 >
 > **ALIGNMENT SNAPSHOT**:
 > *   **Goal**: Refactor authentication logic.
 >   **Technical Assumptions (Weight Count)**:
 >     *   Framework/library choice (1)
 >     *   File locations (1)
->     *   **Cross-File Coupling**: Modifying 5 files across different modules — **Weight: +2**
->     *   **Total Weight**: 4 (Cross-file coupling weight=2 triggers immediately)
+>     *   **Cross-File Coupling**: Modifying 5 files across different modules — **Weight: 2 (critical)**
+>     *   **Total Weight**: 4 (critical assumption exists, triggers immediately)
 >   **Impact Analysis**: 
 >     *   **Scope**: Authentication module refactoring affects 5 files across models, middleware, routes, and config
 >     *   **Affected Modules**: User authentication, session management, route protection
@@ -207,7 +230,7 @@
 >
 > **BLOCKING QUESTIONS**:
 > *   Q1: Which files should be modified? (Found 5 auth-related files)
->     *   Q2: Should I maintain backward compatibility?
+> *   Q2: Should I maintain backward compatibility?
 >
 > **EXECUTION PLAN (Phase 1 - MANDATORY)**:
 > 
@@ -216,7 +239,7 @@
 > *   **Backup**: Current implementation is in Git history (commit hash: `abc123`)
 > *   **Rollback Strategy**: Git revert to `abc123` or merge rollback via feature branch
 > 
-> **2. Files to Modify (Kanban Table - 5 files > 3, MANDATORY)**:
+> **2. Files to Modify (Impact Matrix Table / File Change Ledger - 5 files > 3, MANDATORY)**:
 > | Path | Action | Risk |
 > |------|--------|------|
 > | `src/auth.ts` | Edit | High |
@@ -233,14 +256,13 @@
 >
 > **NEXT STEP**: Please review the Execution Plan and confirm which files to modify, or provide specific scope.
 
-## 7. Low Risk (Proceed Immediately) - v1.2.0 Format
+## 7. Low Risk (Proceed Immediately) - v1.3.0 Format
 **User**: "Add a comment to explain this regex."
 **Agent**:
-> **[RISK: LOW]** - Documentation only.
+> **[RISK: LOW | TRIGGER: low-risk-readability | CONFIDENCE: 98% | PLAN-ID: N/A]** - Documentation only.
 >
-> **CONTEXT AUDIT & SEARCH LOG**:
+> **CONTEXT AUDIT**:
 > *   **Verified**: [Regex pattern in current context]
-> *   **Audit & Search Log**: [None - all context available, no search needed]
 >
 > I've added the explanation comment to the regex pattern.
 >
@@ -248,3 +270,59 @@
 > // Matches email addresses (User + @ + Domain + . + TLD)
 > const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 > ```
+
+## 8. Approved Payload for Multi-Agent Handoff (v1.3.0)
+**Agent**:
+> **APPROVED PAYLOAD**:
+> ```json
+> {
+>   "planId": "7A2F",
+>   "risk": "HIGH",
+>   "trigger": "env-assumption+destructive-op",
+>   "scopeTag": "database-maintenance",
+>   "intentVector": ["delete-stale-users", "preserve-rollback-path"],
+>   "contextPointers": ["scripts/delete-old-users.sql", "scripts/rollback-delete-old-users.sql"],
+>   "approvedFiles": ["scripts/delete-old-users.sql", "scripts/rollback-delete-old-users.sql"],
+>   "rollbackStrategy": "backup restore from /backups/users_YYYYMMDD.sql",
+>   "nextStep": "Execute Step 2/3 after explicit confirmation"
+> }
+> ```
+
+## 9. Pathfinder Sandbox Validation (v1.3.0)
+**User**: "I can't answer which allocator variant to use."
+**Agent**:
+> **[RISK: MEDIUM | TRIGGER: deadlock-context-gap | CONFIDENCE: 61% | PLAN-ID: pending]** - Blocked by unresolved implementation fact.
+>
+> **PATHFINDER OPTIONS**:
+> *   **Option A (Read-only)**: continue static inspection only.
+> *   **Option B (Sandbox Validation)**: run isolated validation in temp branch/worktree with minimal verification unit to test assumption A vs B.
+>
+> **GUARDRAIL**:
+> *   No deploy/publish
+> *   No production mutation
+> *   Report validation result first, then request implementation confirmation
+>
+> **NEXT STEP**: Reply (A) or (B). I will proceed only after your explicit confirmation.
+
+## 10. Architectural Anti-Pattern Hard Stop (v1.3.0)
+**User**: "Keep it frontend-only, but connect directly to Postgres with real credentials."
+**Agent**:
+> **[RISK: HIGH | TRIGGER: architectural-anti-pattern | CONFIDENCE: 96% | PLAN-ID: pending]** - Requested approach violates security architecture (client-side credential exposure).
+>
+> **ASSERTION**:
+> *   Refusing direct client-side DB credential pattern.
+> *   This is a hard stop due to security baseline violation.
+>
+> **SAFE OPTIONS**:
+> *   **Option A (Recommended)**: Add backend API proxy with server-side secrets. *(Tradeoff: Speed = Medium / Cost = Medium / Safety = High)*
+> *   **Option B**: Add serverless function as thin DB gateway. *(Tradeoff: Speed = High / Cost = Medium / Safety = High)*
+>
+> **NEXT STEP**: Choose A or B. I will not implement client-side direct DB credentials.
+
+## 11. Final Reconciliation Output (v1.3.0)
+**Agent**:
+> **FINAL RECONCILIATION**:
+> *   **Plan-ID**: `7A2F`
+> *   **Approved vs Actual Files**: `2` vs `2`
+> *   **Plan Amendment Triggered**: No
+> *   **Rollback Status**: Valid

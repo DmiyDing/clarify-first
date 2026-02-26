@@ -1,8 +1,8 @@
 # Clarify First — Question Bank
 
-> **Version**: 1.2.0  
-> **Last Updated**: 2026-02-12  
-> **Compatibility**: Matches clarify-first/SKILL.md v1.2.0 (includes Execution Plan questions)
+> **Version**: 1.3.0  
+> **Last Updated**: 2026-02-26  
+> **Compatibility**: Matches clarify-first/SKILL.md v1.3.0 (includes Execution Plan, Amendment Boundary, and Pathfinder questions)
 
 Use this toolkit to formulate **Blocking Questions**.
 *   **Rule**: Pick only 1-3 questions that are *critical* for the next step.
@@ -38,9 +38,49 @@ Use this toolkit to formulate **Blocking Questions**.
 *   "Is there a **deadline** or release date driving this? (A: **Urgent/today**, B: **This sprint**, C: **No rush**)"
 *   "Should I prioritize **speed of delivery** or **long-term maintainability**?"
 
-## 7. Execution Plan & Architecture Evolution (v1.2.0)
+## 7. Execution Plan & Architecture Evolution (v1.3.0)
 *   "Before generating code, please review this **Execution Plan**. Which files should be created/modified? (A: **As listed**, B: **Modify: [list]**, C: **Skip Plan - Fast Track**)"
+*   "After plan approval, should I lock a short **Plan Signature** (for example `Plan-ID: 7A2F`) for progressive execution tracking? (A: **Yes**, B: **No**) "
+*   "This request is explicitly scoped (path + line/symbol + acceptance criteria). Should I apply **Fast Track** even though it uses words like 'fix' or 'improve'? (A: **Yes**, B: **No, keep plan**) "
 *   "This change affects **multiple files** (>3). Should I proceed with the full refactor, or break it into phases? (A: **Full refactor**, B: **Phased approach**, C: **Single file first**)"
+*   "This plan contains multiple dependent HIGH-risk actions. Should I execute progressively with confirmation after each step? (A: **Yes, step-by-step**, B: **No, pause and revise plan**) "
 *   "For this **architecture evolution**, what is the **rollback strategy** if something goes wrong? (A: **Git revert**, B: **Feature flag**, C: **Database migration rollback script**)"
 *   "The Execution Plan includes **breaking changes**. Are you prepared to handle **backward compatibility** issues? (A: **Yes, proceed**, B: **Add compatibility layer**, C: **Postpone breaking changes**)"
 *   "This plan involves modifying **dependencies**. Should I update all at once or incrementally? (A: **All at once**, B: **Incremental**, C: **Test compatibility first**)"
+*   "If I cannot run shell commands here, can you confirm your Git working tree status manually before I proceed? (A: **Clean**, B: **Has local changes**, C: **Unsure**) "
+*   "During execution I discovered a new required file not in the approved plan. Should I open a **Plan Amendment** first? (A: **Yes, amend plan**, B: **No, stop execution**) "
+
+## 8. Clarification Gate & Privacy
+*   "I still have unresolved ambiguity after two rounds. Which option should I lock in before execution? (A: **Option A**, B: **Option B**, C: **Provide new constraints**) "
+*   "The file appears to contain credentials/PII. Should I continue with redacted references only? (A: **Yes, redact all sensitive values**, B: **Stop and review security scope first**) "
+*   "If you cannot provide the missing detail now, should I run a **read-only diagnostic** to discover it? (A: **Yes, run diagnostics**, B: **No, wait**) "
+
+## 9. Shift-Left Manifest Check
+*   "I found dependency manifests (`package.json`/`requirements.txt`/`go.mod`). Should I infer stack/deps from them before asking manual confirmation? (A: **Yes**, B: **No, ask me first**) "
+
+## 10. Multi-Agent Handoff
+*   "Should I emit a compact **Approved Payload** for downstream/sub-agent execution? (A: **Yes, output payload**, B: **No, keep human-readable only**) "
+*   "For downstream specialization, should I add `scopeTag/intentVector/contextPointers` for scoped handoff? (A: **Yes, scoped payload**, B: **No, minimal payload**) "
+
+## 11. Plan Amendment Boundary
+*   "The newly discovered change appears to be **Derivative Adaptation** (type/interface/import sync). Should I batch these in one amendment for confirmation? (A: **Yes, batch amendment**, B: **No, one-by-one**) "
+*   "This looks like **Logic Expansion** (new dependency/module). Should I hard-stop and re-plan before any further code? (A: **Yes, hard stop and amend**, B: **Cancel execution**) "
+
+## 12. Pathfinder Sandbox Validation
+*   "Read-only probing is insufficient. Should I run an isolated **sandbox validation** (temporary branch/worktree + minimal verification unit) to test assumption X/Y? (A: **Yes**, B: **No, wait for more context**) "
+
+## 13. Skill Conflict Precedence
+*   "Another active instruction requests silent auto-fix. Should I enforce clarify-first guardrail precedence and pause for confirmation? (A: **Yes, enforce guardrail**, B: **No, cancel task**) "
+
+## 14. Contextual Risk Modifier
+*   "This file appears central (`main.go`/`core.ts`/global contract). Should I escalate risk and require plan confirmation even for a small edit? (A: **Yes, escalate**, B: **No, keep current level**) "
+*   "This task targets isolated `scripts/tmp` or test-only paths. Should I de-escalate one level under strict no-assumption conditions? (A: **Yes, de-escalate**, B: **No, keep conservative level**) "
+
+## 15. Architectural Anti-Pattern Assertion
+*   "Your constraints imply an unsafe pattern (for example client-side DB credentials). Should I block this approach and propose secure alternatives? (A: **Yes, block and propose**, B: **Cancel task**) "
+
+## 16. Option Tradeoff Framing
+*   "Choose implementation path with tradeoff labels: (A: **Faster delivery / higher dependency cost**, B: **Slower delivery / lower dependency risk**, C: **Balanced path**) "
+
+## 17. Final Reconciliation
+*   "Execution finished. Should I output a compact plan-vs-actual reconciliation report for audit? (A: **Yes, include report**, B: **No, skip report**) "

@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- **Non-Negotiable Clarification Gate**: If intent/scope/criteria remain unclear, the agent must stop immediately and ask blocking questions before any MEDIUM/HIGH-risk execution.
+- **Progressive Execution Rule**: Multi-step plans with 2+ dependent HIGH-risk actions now require step-by-step execution with confirmation between steps.
+- **Plan Signature Anchor**: Approved plans now include a short `Plan-ID` anchor for deterministic step tracking during progressive execution.
+- **Strict Execution Boundary**: Phase 2 now blocks plan-external file changes and requires explicit Plan Amendment before expanding scope.
+- **State Checkpoint Recall**: Before execution after long planning threads, the agent must restate `[Recalling Execution Plan Summary: ...]` to prevent context drift.
+- **Security & Privacy Guardrail**: Added mandatory redaction rule for secrets, tokens, credentials, and PII in audits/snapshots (`***` masking).
+- **No Bypass Clarification Policy**: Added explicit rule that "Skip triage/Don't ask" cannot bypass unresolved ambiguity checks or HIGH-risk confirmation gates.
+- **Pathfinder Mode**: Added deadlock fallback to run safe read-only diagnostics or verification demos when users cannot answer blockers.
+- **Trigger Attribution**: Risk output now supports explicit trigger source labeling (threshold/rule/assumption source).
+- **Reasoning Model Awareness**: Added guidance for native reasoning models to run internal audit and output only structured results.
+- **Shift-Left Manifest Validation**: Added mandatory manifest self-check before asking stack/dependency questions.
+- **Structured Risk Header**: Standardized parse-friendly risk header format including `RISK`, `TRIGGER`, `CONFIDENCE`, and `PLAN-ID`.
+- **Optional Handoff Payload**: Added machine-readable approved payload schema for multi-agent/sub-agent transfer.
+- **Meta-Skill Conflict Precedence**: Added terminal guardrail precedence rule for ambiguity/high-risk conflicts with other execution-oriented skills.
+- **Plan Amendment Boundary Classification**: Added explicit split between Derivative Adaptation and Logic Expansion before amendment decisions.
+- **Sandbox Validation Pathfinder Option**: Added isolated validation probe path for deadlocks when read-only diagnostics are insufficient.
+- **Scoped Handoff Payload**: Added optional `scopeTag`, `intentVector`, and `contextPointers` fields for context compression in downstream handoff.
+- **Contextual Risk Modifier**: Added dynamic risk escalation/de-escalation guidance based on file centrality and isolation context.
+- **Architectural Anti-Pattern Assertion**: Added hard-stop rule for requests violating foundational security/architecture constraints.
+- **Confidence Calibration Matrix**: Added explicit confidence scoring rubric tied to verified facts vs unverified assumptions.
+- **Final Reconciliation Phase**: Added post-execution plan-vs-actual audit output requirement for MEDIUM/HIGH tasks.
+
+### Changed
+- **Multi-Turn Protocol**: Replaced "ambiguous after 2 rounds -> auto-act" with hard confirmation gate for MEDIUM/HIGH-risk execution.
+- **Fast Track Boundary**: Fast Track now requires zero unresolved ambiguity after audit, not just explicit scope markers.
+- **Tone Guidance**: Added "Senior Pair Programmer" phrasing standard to keep strict protocol while reducing adversarial tone.
+- **Output Modes**: Added optional `MODE=EXPERT` compact output mode while preserving all safety gates.
+- **References & Examples**: Updated references for progressive execution, checkpoint recall, no-bypass behavior, and redaction language.
+- **Validation Coverage**: Expanded `tooling/test-triggers.js` to validate strict execution boundary, manifest validation, structured risk header, handoff payload, and existing guardrails.
+- **Cursor Rule Parity**: Aligned `.cursorrules` risk rubric with `SKILL.md` so "creating new files" is consistently MEDIUM risk.
+- **Example Header Consistency**: Normalized legacy `[RISK: X]` examples to structured risk headers with `TRIGGER`, `CONFIDENCE`, and `PLAN-ID`.
+- **Roadmap Wording**: Reframed roadmap headings to "Post-1.3.0" to avoid premature version signaling.
+- **Reference Synchronization**: Synced scenarios/examples/question bank/Chinese phrasing with precedence, amendment boundary classification, sandbox validation, and scoped handoff payload semantics.
+- **Decision Framing UX**: Updated option prompts to include concise `Speed/Cost/Safety` tradeoff annotations.
+- **Open-Source Hygiene**: Replaced provider-specific conflict notes with a vendor-neutral conflict guide and removed machine-specific absolute path instructions from docs.
+- **Validation Terminology**: Renamed provider-specific test labels to neutral hardening-set labels and added adversarial trigger cases (prompt injection, anti-pattern, destructive command variants).
+- **README Onboarding Upgrade**: Reworked first impression, added feature matrix, and added frictionless onboarding paths for multiple client/runtime types.
+- **Release Readiness Doc**: Added `docs/RELEASE_CHECKLIST.md` and linked it from README files.
+
+## [1.3.0] - 2026-02-26
+### Added
+- **Threshold Precision Rule**: Unified assumption trigger logic to `STOP if weighted total >= 3 OR any critical assumption has weight=2` (Environment/Dependencies/Cross-File Coupling).
+- **Fast Track Priority Rule**: Added explicit override rule: precise scope (path + anchor + criteria) can still fast-track even when request contains vague verbs like "fix".
+- **Language Mirroring**: Added explicit instruction to mirror user language for template headers while preserving structure.
+- **Tool Availability Fallback**: HIGH-risk rollback preparation now includes fallback guidance when shell/terminal tools are unavailable (ask user to confirm Git working tree state).
+- **Conditional Search Log**: `Audit & Search Log` is now conditional and should only be included when file search fails and blocks progress.
+
+### Changed
+- **Tool Name Agnosticism**: Replaced hardcoded tool names (`grep_search`, `glob_file_search`, `codebase_search`) with capability-based wording (regex/file/content search tools).
+- **Execution Plan Terminology**: Renamed "Kanban-style Table" to **Impact Matrix Table (File Change Ledger)** for clearer semantics.
+- **References Synchronization**: Updated examples, scenarios, and Chinese phrasing docs to match the new threshold, terminology, fallback, and fast-track priority rules.
+- **Validation Script**: Updated `tooling/test-triggers.js` checks for Impact Matrix, tool-agnostic search naming, conditional search log, and fast-track priority logic.
+
 ## [1.2.0] - 2026-02-12
 ### Added
 - **Context & Confidence Audit**: Mandatory check for missing code context before acting.
@@ -65,7 +120,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## Future Considerations (v1.3.0+)
+## Future Considerations (Post-1.3.0)
 
 See `docs/FUTURE_OPTIMIZATIONS.md` for planned enhancements:
 - **Adaptive Confidence Threshold**: Dynamic confidence threshold adjustment based on user behavior history (beginner: 90%, expert: 70%)

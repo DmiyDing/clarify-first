@@ -5,23 +5,43 @@
 [![Spec](https://img.shields.io/badge/Spec-Agent--Skills-blueviolet)](https://agentskills.io/specification)
 [![Cursor Compatible](https://img.shields.io/badge/Cursor-Compatible-blue)](https://cursor.com)
 
-**Stop AI from guessing. Force your Agent to ask the right questions before touching your code.**
+**Stop your AI from guessing. Clarify First is a deterministic state-machine and safety middleware that forces agents to ask before acting on ambiguous or high-risk tasks.**
 
-Clarify First is a skill designed for one purpose: **Clarification**. It stops AI agents from blindly executing when requirements are vague, conflicting, or high-risk. It transforms the AI from a reckless executor into a thoughtful partner that aligns on scope *before* acting.
+Clarify First is a protocol-first skill focused on one thing: **alignment before execution**. It blocks silent assumptions, enforces explicit confirmation, and keeps plan vs execution auditable.
 
 [中文](./README.zh-CN.md) · **License:** [Apache-2.0](./LICENSE)
 
 ---
 
-## The Problem: "Guess-and-Run"
-Most AI coding assistants try to be too helpful. When you give a vague instruction like *"Optimize this,"* they start refactoring immediately without knowing if you care about speed, readability, or memory.
+## Why You Need This
+Most coding agents optimize for immediacy, not certainty. In ambiguous or high-impact requests, this creates hidden assumptions and expensive mistakes.
 
-**Clarify First** flips the script: **Clarify First, Code Second.**
+**Clarify First** flips the default to: **Clarify First, Code Second**.
 
-## Core Features
-*   ❓ **Proactive Clarification:** If the goal is 1% ambiguous, the AI must ask for missing context.
-*   🤝 **Scope Alignment:** Proposes options (A/B/C) to make sure you are on the same page.
-*   🛑 **Execution Gate:** Stops the AI from running destructive or high-impact commands until you say "Yes".
+## Without vs With
+
+| Without Clarify First | With Clarify First |
+|-----------------------|--------------------|
+| User: "Delete old files." | User: "Delete old files." |
+| Agent runs destructive command with assumptions. | Agent emits risk header, asks target scope + rollback, waits for confirmation. |
+| Result: Wrong scope / hard recovery. | Result: Intent-aligned, reversible execution path. |
+
+## Feature Matrix
+
+| Capability | Included |
+|------------|----------|
+| Non-bypass clarification gate | ✅ |
+| Weighted assumption triage | ✅ |
+| Two-phase plan lock (Plan -> Confirm -> Execute) | ✅ |
+| Strict execution boundary + amendment protocol | ✅ |
+| Progressive execution for dependent high-risk actions | ✅ |
+| Plan-ID anchoring + long-thread checkpoint recall | ✅ |
+| Security redaction in audit outputs | ✅ |
+| Architectural anti-pattern hard stop | ✅ |
+| Contextual risk modifier (file centrality aware) | ✅ |
+| Final reconciliation (plan vs actual) | ✅ |
+| Multi-agent handoff payload (scoped pointers) | ✅ |
+| Adversarial trigger tests in tooling | ✅ |
 
 ## Example: The Power of a Question
 
@@ -31,17 +51,26 @@ Most AI coding assistants try to be too helpful. When you give a vague instructi
 | Agent starts massive refactors. | Agent: **"Risk: Medium. I need to clarify: are we optimizing for runtime speed, bundle size, or code readability?"** |
 | Result: Broken code, wrong focus. | Result: The AI does exactly what you needed. |
 
-## Install
+## Fast Onboarding (TTFV)
 
-**For Cursor, Claude Code, and other clients that support Agent Skills:**
+### 1) Cursor / Windsurf style clients
+- Copy [`/.cursorrules`](./.cursorrules) into your project root (or merge into your existing rules file).
+
+### 2) Agent Skills compatible clients
+- Install from registry/repo:
 
 ```bash
 npx -y skills add DmiyDing/clarify-first
 ```
 
-Restart your client after installation. If the skill doesn’t auto-trigger, say: *"Use the clarify-first skill."*
+Restart your client after installation. If auto-trigger is weak, explicitly invoke: *"Use the clarify-first skill."*
 
-**Codex (AGENTS.md):** To bake the behavior into a repo or global config, add the [snippet below](#codex-agentsmd-snippet) to `AGENTS.override.md` or `AGENTS.md`.
+### 3) Codex / AGENTS.md environments
+- Add the [snippet below](#codex-agentsmd-snippet) to `AGENTS.override.md` or `AGENTS.md`.
+
+### 4) Framework orchestration (LangChain / Dify / custom agent runtime)
+- Inject core protocol as system policy from [`clarify-first/SKILL.md`](./clarify-first/SKILL.md).
+- Keep references (`references/*`) as on-demand context files, not always-on prompt payload.
 
 ## Usage
 
@@ -50,6 +79,14 @@ After install, the skill activates when the agent detects ambiguous or high-impa
 - *"Use the clarify-first skill. If anything is ambiguous or high-impact, ask me the blocking questions first."*
 
 The agent will then align on scope, ask 1–5 targeted questions (with choices when possible), and wait for your confirmation before making changes or running commands.
+
+## Testing as Documentation
+
+Protocol behavior is assertion-tested in:
+- [`tooling/test-triggers.js`](./tooling/test-triggers.js)
+- [`tooling/verify-version.js`](./tooling/verify-version.js)
+
+This makes the skill specification verifiable, not only descriptive.
 
 ## How it works
 
@@ -88,6 +125,7 @@ If you see a better approach than requested, present it as an option and ask the
 ├── clarify-first/
 │   ├── SKILL.md          # Core skill definition (Markdown)
 │   └── references/       # Context files loaded on demand
+├── docs/                 # Architecture notes and roadmap
 ├── tooling/              # Maintenance scripts
 ├── .cursorrules          # Cursor rule template (condensed)
 ├── CHANGELOG.md          # Version history
@@ -103,7 +141,7 @@ The skill uses progressive disclosure: the agent loads `clarify-first/SKILL.md` 
 
 ## Future Roadmap
 
-See [`docs/FUTURE_OPTIMIZATIONS.md`](./docs/FUTURE_OPTIMIZATIONS.md) for planned enhancements in v1.3.0+:
+See [`docs/FUTURE_OPTIMIZATIONS.md`](./docs/FUTURE_OPTIMIZATIONS.md) for planned enhancements after v1.3.0:
 - **Adaptive Confidence Threshold**: Dynamic threshold adjustment based on user behavior (beginner: 90%, expert: 70%)
 - Enhanced multilingual support
 - Context memory improvements
@@ -112,3 +150,5 @@ See [`docs/FUTURE_OPTIMIZATIONS.md`](./docs/FUTURE_OPTIMIZATIONS.md) for planned
 ## Contributing and license
 
 Contributions are welcome. This project is licensed under [Apache-2.0](./LICENSE).
+
+Before publishing, follow [`docs/RELEASE_CHECKLIST.md`](./docs/RELEASE_CHECKLIST.md).

@@ -88,12 +88,12 @@ if (referenceMismatches.length > 0) {
     }
   });
   console.error('\n💡 Tip: All reference files MUST have version declaration matching the main version.');
-  console.error('   Format: "Version: 1.2.0" or "v1.2.0" or "[1.2.0]"');
+  console.error('   Format: "Version: x.y.z" or "vx.y.z" or "[x.y.z]"');
   process.exit(1); // Exit with error - version declarations are now MANDATORY
 }
 
 console.log('\n✅ All core versions match.');
 if (referenceMismatches.length === 0) {
-  console.log('✅ All reference file versions match (where declared).');
+  console.log('✅ All reference file versions match (mandatory declarations present).');
 }
 process.exit(0);
