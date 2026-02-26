@@ -12,3 +12,5 @@ tmp/
 dist/
 coverage/
 .claude/
+docs/
+tooling/test-triggers.js

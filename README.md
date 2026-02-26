@@ -80,13 +80,10 @@ After install, the skill activates when the agent detects ambiguous or high-impa
 
 The agent will then align on scope, ask 1–5 targeted questions (with choices when possible), and wait for your confirmation before making changes or running commands.
 
-## Testing as Documentation
+## Verification
 
-Protocol behavior is assertion-tested in:
-- [`tooling/test-triggers.js`](./tooling/test-triggers.js)
+Version and reference consistency can be checked with:
 - [`tooling/verify-version.js`](./tooling/verify-version.js)
-
-This makes the skill specification verifiable, not only descriptive.
 
 ## How it works
 
@@ -125,7 +122,6 @@ If you see a better approach than requested, present it as an option and ask the
 ├── clarify-first/
 │   ├── SKILL.md          # Core skill definition (Markdown)
 │   └── references/       # Context files loaded on demand
-├── docs/                 # Architecture notes and roadmap
 ├── tooling/              # Maintenance scripts
 ├── .cursorrules          # Cursor rule template (condensed)
 ├── CHANGELOG.md          # Version history
@@ -139,16 +135,6 @@ This skill follows the [Agent Skills specification](https://agentskills.io/speci
 
 The skill uses progressive disclosure: the agent loads `clarify-first/SKILL.md` when the skill triggers, and only opens `references/*` when needed.
 
-## Future Roadmap
-
-See [`docs/FUTURE_OPTIMIZATIONS.md`](./docs/FUTURE_OPTIMIZATIONS.md) for planned enhancements after v1.3.0:
-- **Adaptive Confidence Threshold**: Dynamic threshold adjustment based on user behavior (beginner: 90%, expert: 70%)
-- Enhanced multilingual support
-- Context memory improvements
-- Collaboration features
-
 ## Contributing and license
 
 Contributions are welcome. This project is licensed under [Apache-2.0](./LICENSE).
-
-Before publishing, follow [`docs/RELEASE_CHECKLIST.md`](./docs/RELEASE_CHECKLIST.md).

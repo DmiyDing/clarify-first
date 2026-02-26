@@ -72,10 +72,9 @@ npx -y skills add DmiyDing/clarify-first
 
 Agent 会先对齐范围、提出 1–5 个关键问题（尽量给选项），并在你确认后再改代码或执行命令。
 
-## 测试即文档
+## 校验
 
-协议行为由断言脚本验证，不只是“写在文档里”：
-- [`tooling/test-triggers.js`](./tooling/test-triggers.js)
+可使用以下脚本检查版本与引用一致性：
 - [`tooling/verify-version.js`](./tooling/verify-version.js)
 
 ## 工作原理
@@ -115,7 +114,6 @@ If you see a better approach than requested, present it as an option and ask the
 ├── clarify-first/
 │   ├── SKILL.md          # 技能定义（Markdown）
 │   └── references/       # 按需加载的上下文文件
-├── docs/                 # 架构说明与路线图
 ├── tooling/              # 维护脚本
 ├── .cursorrules          # Cursor 规则模板（精简版）
 ├── CHANGELOG.md          # 版本历史
@@ -127,5 +125,3 @@ If you see a better approach than requested, present it as an option and ask the
 ## 参与与协议
 
 欢迎贡献。本项目采用 [Apache-2.0](./LICENSE) 许可。
-
-发布前建议执行 [`docs/RELEASE_CHECKLIST.md`](./docs/RELEASE_CHECKLIST.md) 清单。

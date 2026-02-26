@@ -32,7 +32,7 @@ All notable changes to this project will be documented in this file.
 - **Tone Guidance**: Added "Senior Pair Programmer" phrasing standard to keep strict protocol while reducing adversarial tone.
 - **Output Modes**: Added optional `MODE=EXPERT` compact output mode while preserving all safety gates.
 - **References & Examples**: Updated references for progressive execution, checkpoint recall, no-bypass behavior, and redaction language.
-- **Validation Coverage**: Expanded `tooling/test-triggers.js` to validate strict execution boundary, manifest validation, structured risk header, handoff payload, and existing guardrails.
+- **Validation Coverage**: Expanded validation rules for strict execution boundary, manifest validation, structured risk headers, handoff payloads, and adversarial prompts.
 - **Cursor Rule Parity**: Aligned `.cursorrules` risk rubric with `SKILL.md` so "creating new files" is consistently MEDIUM risk.
 - **Example Header Consistency**: Normalized legacy `[RISK: X]` examples to structured risk headers with `TRIGGER`, `CONFIDENCE`, and `PLAN-ID`.
 - **Roadmap Wording**: Reframed roadmap headings to "Post-1.3.0" to avoid premature version signaling.
@@ -41,7 +41,9 @@ All notable changes to this project will be documented in this file.
 - **Open-Source Hygiene**: Replaced provider-specific conflict notes with a vendor-neutral conflict guide and removed machine-specific absolute path instructions from docs.
 - **Validation Terminology**: Renamed provider-specific test labels to neutral hardening-set labels and added adversarial trigger cases (prompt injection, anti-pattern, destructive command variants).
 - **README Onboarding Upgrade**: Reworked first impression, added feature matrix, and added frictionless onboarding paths for multiple client/runtime types.
-- **Release Readiness Doc**: Added `docs/RELEASE_CHECKLIST.md` and linked it from README files.
+
+### Removed
+- **Non-Essential Open-Source Artifacts**: Removed `docs/` and `tooling/test-triggers.js` from public repository scope.
 
 ## [1.3.0] - 2026-02-26
 ### Added
@@ -122,8 +124,4 @@ All notable changes to this project will be documented in this file.
 
 ## Future Considerations (Post-1.3.0)
 
-See `docs/FUTURE_OPTIMIZATIONS.md` for planned enhancements:
-- **Adaptive Confidence Threshold**: Dynamic confidence threshold adjustment based on user behavior history (beginner: 90%, expert: 70%)
-- Enhanced multilingual support
-- Context memory improvements
-- Collaboration features
+Future roadmap items are tracked in project discussions and issue planning.
