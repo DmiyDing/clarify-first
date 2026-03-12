@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - **Final Reconciliation Phase**: Added post-execution plan-vs-actual audit output requirement for MEDIUM/HIGH tasks.
 
 ### Changed
+- **GitHub Actions Runtime Maintenance**: Updated `.github/workflows/validate-skill.yml` to use `actions/checkout@v6`, `actions/setup-node@v6`, Node.js 24, and explicit read-only repository permissions to address the Node 20 deprecation warning without changing validation behavior.
 - **Portable Validation & Benchmarking**: `npm run validate:skill` and `npm run benchmark:trigger` now discover Anthropic `skill-creator` via environment variables or common install locations instead of hardcoded local paths.
 - **Benchmark Workflow Notes**: Added a first-pass A/B result note showing the current baseline (`5/11`) and that three aggressive description candidates did not improve recall.
 - **Description Alignment**: Rewrote the skill frontmatter description in third-person style and added an explicit "when not to use" boundary for informational and explicitly scoped low-risk requests.
